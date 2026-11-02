@@ -74,7 +74,7 @@
  <!-- 5. Store -->
  <div class="wz-pane" hidden>
   <label class="sall"><input type="checkbox" id="all"> Select All</label>
-  <div class="stg">{% for k,n,c in stores %}<label class="st"><input type="checkbox" name="stores" value="{{ k }}" {{ 'checked' if k in chosen }}><em style="background:{{ c }}">{{ n[0] }}</em><span>{{ n }}</span></label>{% endfor %}</div>
+  <div class="stg">{% for k,n,c in stores %}<label class="st"><input type="checkbox" name="stores" value="{{ k }}" {{ 'checked' if k in chosen }}><em class="st-logo{% if k == 'instagram' %} st-logo-pair{% elif not store_logos.get(k) %} st-logo-fallback{% endif %}" style="--store-color:{{ c }}">{% if k == 'instagram' %}<img src="{{ url_for('static',filename='stores/instagram.png') }}" alt="Instagram logo" loading="lazy"><img src="{{ url_for('static',filename='stores/facebook.png') }}" alt="Facebook logo" loading="lazy">{% elif store_logos.get(k) %}<img src="{{ url_for('static',filename='stores/'+store_logos[k]) }}" alt="{{ n }} logo" loading="lazy">{% else %}{{ n[0] }}{% endif %}</em><span>{{ n }}</span></label>{% endfor %}</div>
   <p class="hint" style="margin-top:12px">Your release is delivered only to the stores you select.</p>
  </div>
 

@@ -69,6 +69,14 @@ STORES = [("gaana", "Gaana", "#e72c30"), ("jiosaavn", "JioSaavn", "#2bc5b4"), ("
           ("tiktok", "TikTok", "#000000"), ("youtube", "YouTube (Content ID)", "#ff0000"), ("hungama", "Hungama Play", "#6a2fc9"), ("apple", "Apple Music", "#fa243c"),
           ("amazon", "Amazon Music", "#00a8e1"), ("instagram", "Instagram / Facebook", "#c13584"), ("resso", "Resso", "#f4366b"), ("wynk", "Wynk Music", "#e8223c"),
           ("deezer", "Deezer", "#a238ff"), ("tidal", "Tidal", "#111111"), ("soundcloud", "SoundCloud", "#ff5500"), ("snapchat", "Snapchat", "#d9b800")]
+STORE_LOGOS = {
+    "gaana": "gaana.jpg", "ytmusic": "youtube-music.png", "spotify": "spotify.png",
+    "tiktok": "tiktok.png", "youtube": "youtube-content-id.png", "hungama": "hungama-play.jpg",
+    "apple": "apple-music.png", "amazon": "amazon-music.png", "instagram": "instagram.png",
+    "facebook": "facebook.png", "resso": "resso.png", "wynk": "wynk-music.png",
+    "deezer": "deezer.jpg", "tidal": "tidal.png", "soundcloud": "soundcloud.png",
+    "snapchat": "snapchat.jpg",
+}
 STORE_IDS = [x[0] for x in STORES]
 GENRES = ["Bollywood", "Pop", "Hip-Hop / Rap", "Indie / Alternative", "Rock", "Electronic / Dance", "Folk", "Devotional / Spiritual", "Classical", "Ghazal / Sufi", "Regional",
           "Lo-Fi", "R&B / Soul", "Jazz", "Reggae", "Country", "Children's", "Instrumental", "Other"]
@@ -162,7 +170,7 @@ def setup(app, db, need, save, IMG, AUDIO, UPLOADS):
         return render_template("catalog.html", u=u, rows=db().execute(sql + " ORDER BY id DESC", a).fetchall(), q=q, st=st)
 
     def wiz_ctx(u, v=None):
-        return dict(u=u, v=v or {}, artists=items(u, "artist"), labels=items(u, "label", approved_only=True), stores=STORES, genres=GENRES, langs=LANGS,
+        return dict(u=u, v=v or {}, artists=items(u, "artist"), labels=items(u, "label", approved_only=True), stores=STORES, store_logos=STORE_LOGOS, genres=GENRES, langs=LANGS,
                     ptypes=PRIMARY_TYPES, stypes=SECONDARY_TYPES, advisory=ADVISORY, yesno=YESNO, chosen=(v or {}).get("_stores") or STORE_IDS)
 
     @app.route("/catalog/new", methods=["GET", "POST"])
