@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block title %}{{ p.nav }} · Tuneflix{% endblock %}
+{% block body %}<div class="back-wrap"><div class="wrap"><a class="back" href="/">{{ ic('arrow-left','w') }}<span>Back to Home</span><i>{{ ic('home','w') }}</i></a></div></div>
+{% if p.cards %}<section><div class="wrap"><div class="grid" style="margin-top:0">{% for i,t,d in p.cards %}<div class="card"><div class="ct">{{ ic(i,'w') }}</div><h3>{{ t }}</h3><p>{{ d }}</p></div>{% endfor %}</div></div></section>{% endif %}
+{% if p.code %}<section style="padding-top:0"><div class="wrap"><pre class="code">{{ p.code }}</pre></div></section>{% endif %}
+{% if p.steps %}<section style="padding-top:0"><div class="wrap"><div class="eyebrow">How it works</div><h2>Three steps.</h2><div class="steps">{% for t,d in p.steps %}<div class="step"><b>0{{ loop.index }}</b><h3>{{ t }}</h3><p>{{ d }}</p></div>{% endfor %}</div></div></section>{% endif %}
+{% if p.faq %}<section><div class="wrap">{% for q,a in p.faq %}<details><summary>{{ q }}</summary><p>{{ a }}</p></details>{% endfor %}</div></section>{% endif %}
+<section class="pg-hero"><div class="wrap"><div class="eyebrow">{{ p.eyebrow }}</div><h1>{{ p.title }}</h1><p class="sub">{{ p.lead }}</p>
+<div class="cta"><a class="btn p" href="/request-access">Register now</a><a class="btn g" href="/login">Sign in</a></div></div></section>{% endblock %}

@@ -1,0 +1,200 @@
+{% extends "base.html" %}{% block title %}Register — Tuneflix{% endblock %}
+{% block footer %}{% endblock %}
+{% block body %}<link rel="stylesheet" href="{{ url_for('static',filename='wizard.css') }}?v={{ asset_v }}">
+{% set ARL %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>{% endset %}
+{% set ARR %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>{% endset %}
+{% set UP %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>{% endset %}
+<div class="authwrap"><div class="form wide wz">
+<a href="/" class="logo authlogo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a>
+<div style="display:flex;gap:8px;margin-bottom:24px"><a href="/login" class="btn g" style="flex:1;text-align:center;padding:11px">Sign in</a><a href="/request-access" class="btn p" style="flex:1;text-align:center;padding:11px">Register</a></div>
+<h1>New here?</h1><p class="m" style="margin-bottom:6px">Signing up is easy. It only takes a few steps.</p>
+
+<form method="post" id="rf" novalidate autocomplete="on" enctype="multipart/form-data">{{ tk() }}
+<div data-wiz data-start="{{ step - 1 }}">
+ <div class="wz-tabs" role="tablist">
+  <button type="button" class="wz-tab"><i>1</i>Account</button>
+  <button type="button" class="wz-tab"><i>2</i>Details</button>
+  <button type="button" class="wz-tab"><i>3</i>KYC</button>
+  <button type="button" class="wz-tab"><i>4</i>Distributor</button>
+  <button type="button" class="wz-tab"><i>5</i>Verify</button>
+ </div>
+
+ <!-- 1. Individual or Company -->
+ <div class="wz-pane">
+  <h3>Who is registering?</h3><p class="hint">Choose how you will use Tuneflix.</p>
+  <div class="choice">
+   <label><input type="radio" name="acct_type" value="Individual" {{ 'checked' if v.get('acct_type','Individual')=='Individual' }}><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>I am an Individual<small>Artist, singer, producer, creator</small></span></label>
+   <label><input type="radio" name="acct_type" value="Company" {{ 'checked' if v.get('acct_type')=='Company' }}><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2M10 21v-4h4v4"/></svg>I am a Company<small>Label, studio, catalogue owner, business</small></span></label>
+  </div>
+ </div>
+
+ <!-- 2. Details -->
+ <div class="wz-pane" hidden>
+  <div id="coBox" hidden>
+   <div class="g2c"><div><label>Company / label name <b class="req">*</b></label><input name="company" value="{{ v.get('company','') }}" maxlength="120"></div>
+   <div><label>Authorized signatory <b class="req">*</b></label><input name="signatory" value="{{ v.get('signatory','') }}" maxlength="120" placeholder="Person who signs the agreement"></div></div>
+  </div>
+  <div class="g2c">
+   <div><label>Full name <b class="req">*</b></label><input name="name" value="{{ v.get('name','') }}" required maxlength="120" autocomplete="name"></div>
+   <div><label>Mobile number <b class="req">*</b></label><input name="phone" type="tel" value="{{ v.get('phone','') }}" required placeholder="+91 98765 43210" autocomplete="tel"></div>
+   <div><label>Email <b class="req">*</b></label><input type="email" name="email" id="email" value="{{ v.get('email','') }}" required autocomplete="email"></div>
+   <div><label>Website / channel / profile link</label><input name="website" value="{{ v.get('website','') }}" maxlength="200" placeholder="https://"></div>
+   <div><label>Country <b class="req">*</b></label><select name="country" required>{% for c in ['India','Nepal','Bangladesh','Sri Lanka','United Arab Emirates','United States','United Kingdom','Canada','Australia','Other'] %}<option {{ 'selected' if v.get('country','India')==c }}>{{ c }}</option>{% endfor %}</select></div>
+   <div><label>State</label><input name="state" value="{{ v.get('state','') }}" maxlength="60" autocomplete="address-level1"></div>
+   <div><label>City <b class="req">*</b></label><input name="city" value="{{ v.get('city','') }}" required maxlength="60" autocomplete="address-level2"></div>
+   <div><label>Address</label><input name="address" value="{{ v.get('address','') }}" maxlength="250" autocomplete="street-address"></div>
+   <div><label>Password <b class="req">*</b></label><input type="password" name="password" id="pw" minlength="8" required autocomplete="new-password" placeholder="At least 8 characters"></div>
+   <div><label>Confirm password <b class="req">*</b></label><input type="password" name="confirm" id="pw2" minlength="8" required autocomplete="new-password"></div>
+  </div>
+ </div>
+
+ <!-- 3. KYC -->
+ <div class="wz-pane" hidden>
+  <h3>KYC documents</h3><p class="hint">Enter your Aadhaar and PAN number, then upload a clear photo or PDF of each card.</p>
+  <div class="kyc">
+   <div class="kcard">
+    <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.6-1.6 1.8-2.4 3-2.4s2.4.8 3 2.4M15 10h3M15 13h3"/></svg>Aadhaar card</h4>
+    <label>Aadhaar number <b class="req">*</b></label>
+    <input name="aadhaar" id="aadhaar" value="{{ v.get('aadhaar','') }}" inputmode="numeric" maxlength="14" placeholder="XXXX XXXX XXXX" autocomplete="off" required>
+    <div class="upl"><input type="file" name="aadhaar_file" id="aadhaar_file" accept="image/jpeg,image/png,image/webp,application/pdf"><label class="upl-btn" for="aadhaar_file">{{ UP }} Upload Aadhaar card</label><div class="upl-info" id="aadhaar_info"><span>JPG, PNG or PDF · max 5 MB</span></div></div>
+   </div>
+   <div class="kcard">
+    <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10h6M7 14h4M16 10h1M16 14h1"/></svg>PAN card</h4>
+    <label>PAN number <b class="req">*</b></label>
+    <input name="pan" id="pan" value="{{ v.get('pan','') }}" maxlength="10" placeholder="ABCDE1234F" autocomplete="off" style="text-transform:uppercase" required>
+    <div class="upl"><input type="file" name="pan_file" id="pan_file" accept="image/jpeg,image/png,image/webp,application/pdf"><label class="upl-btn" for="pan_file">{{ UP }} Upload PAN card</label><div class="upl-info" id="pan_info"><span>JPG, PNG or PDF · max 5 MB</span></div></div>
+   </div>
+  </div>
+  <div class="secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg><span>Your documents are used only for KYC verification. They are private and visible only to you and the Tuneflix admin team.</span></div>
+ </div>
+
+ <!-- 4. Distributor / revenue -->
+ <div class="wz-pane" hidden>
+  <h3>Do you have agreements with a distributor?</h3>
+  <div class="choice">
+   <label><input type="radio" name="has_agreement" value="Yes" {{ 'checked' if v.get('has_agreement')=='Yes' }}><span>Yes</span></label>
+   <label><input type="radio" name="has_agreement" value="No" {{ 'checked' if v.get('has_agreement','No')=='No' }}><span>No</span></label>
+  </div>
+  <div id="agBox" hidden>
+   <label>Current / previous distributor</label><input name="old_distributor" value="{{ v.get('old_distributor','') }}" maxlength="120">
+   <label>Reason for change of distributor <b class="req">*</b></label><textarea name="change_reason" id="reason" rows="3" maxlength="500">{{ v.get('change_reason','') }}</textarea>
+  </div>
+  <label>Revenue generated for the last 6 months</label>
+  <div style="display:flex;gap:10px"><select name="revenue_cur" style="width:96px;flex:none"><option {{ 'selected' if v.get('revenue_cur')!='USD' }}>INR</option><option {{ 'selected' if v.get('revenue_cur')=='USD' }}>USD</option></select>
+  <input name="revenue_6m" type="number" min="0" step="0.01" value="{{ v.get('revenue_6m','') }}" placeholder="0.00"></div>
+ </div>
+
+ <!-- 5. Email verification -->
+ <div class="wz-pane" hidden>
+  {% if otp_required() %}
+  <h3>Verify your email</h3><p class="hint">Please click to generate an email OTP for validation.</p>
+  <div class="ostep">
+   <div>Email will be sent to <b id="emTo">—</b></div>
+   <div><button type="button" class="btn p" id="gen" style="width:auto;margin:0">Generate</button></div>
+   <div id="otpBox" hidden>
+    <div class="note" id="sentMsg"></div>
+    <label>Verification code</label>
+    <div class="otp-row"><input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"><button type="button" class="btn p" id="ver">Verify</button></div>
+    <button type="button" class="linkb" id="regen">Regenerate Code</button>
+   </div>
+   <div class="bad" id="otpErr" hidden></div>
+   <div class="ok" id="otpOk" hidden>Your email verification is successful.<br>Please click <b>Submit</b> to complete your registration.</div>
+  </div>
+  {% else %}
+  <h3>Ready to submit</h3>
+  <div class="ok">Everything is filled in. Please click <b>Submit</b> to complete your registration.</div>
+  {% endif %}
+  <p class="hint" id="sigHint" style="margin-top:16px" hidden>Please keep your <b>Authorized Signatory signature</b> in PNG format ready, to sign the agreement with our company.</p>
+ </div>
+
+ <div class="wz-nav"><button type="button" class="btn g wz-prev" hidden>{{ ARL }}Previous</button><span class="sp2"></span>
+  <button type="button" class="btn p wz-next">Next{{ ARR }}</button>
+  <span class="wz-sub" hidden><button class="btn p" id="subBtn" {{ 'disabled' if otp_required() }}>Submit{{ ARR }}</button></span></div>
+</div></form>
+<p class="m" style="margin-top:20px;text-align:center">Already have an account? <a href="/login" style="color:var(--red2)">Sign in</a></p>
+</div></div>
+<script>
+(function(){
+  var f=document.getElementById('rf'), OTP={{ 'true' if otp_required() else 'false' }}, verified=false, LAST=4;
+  function $(i){return document.getElementById(i)}
+  function acct(){var r=f.querySelector('[name=acct_type]:checked');return r?r.value:'Individual'}
+  function ag(){var r=f.querySelector('[name=has_agreement]:checked');return r?r.value:'No'}
+  function sync(){
+    var co=acct()==='Company', b=$('coBox'); b.hidden=!co;
+    [].forEach.call(b.querySelectorAll('input'),function(e){e.required=co});
+    $('sigHint').hidden=!co;
+    var y=ag()==='Yes'; $('agBox').hidden=!y; $('reason').required=y;
+  }
+  f.addEventListener('change',sync); sync();
+
+  /* Aadhaar: auto-space in groups of 4 · PAN: uppercase */
+  $('aadhaar').addEventListener('input',function(){var d=this.value.replace(/\D/g,'').slice(0,12);this.value=d.replace(/(\d{4})(?=\d)/g,'$1 ')});
+  $('pan').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,10)});
+
+  /* KYC file pickers: show name / thumbnail, check type and size */
+  var OKF=/\.(jpe?g|png|webp|pdf)$/i, fileOk={aadhaar_file:false,pan_file:false};
+  function pick(id){
+    var inp=$(id), info=$(id.replace('_file','_info'));
+    inp.addEventListener('change',function(){
+      var fl=inp.files[0]; fileOk[id]=false; info.className='upl-info'; info.textContent='';
+      if(!fl){info.innerHTML='<span>JPG, PNG or PDF · max 5 MB</span>';return}
+      var sp=document.createElement('span');
+      if(!OKF.test(fl.name)){info.className='upl-info err';sp.textContent='Only JPG, PNG or PDF files are allowed.';info.appendChild(sp);return}
+      if(fl.size>5*1048576){info.className='upl-info err';sp.textContent='File is larger than 5 MB.';info.appendChild(sp);return}
+      fileOk[id]=true;info.className='upl-info good';
+      if(/^image\//.test(fl.type)){var im=document.createElement('img');im.alt='';im.src=URL.createObjectURL(fl);info.appendChild(im)}
+      sp.textContent='✓ '+fl.name+' · '+(fl.size/1048576).toFixed(2)+' MB';info.appendChild(sp);
+    });
+  }
+  pick('aadhaar_file');pick('pan_file');
+
+  var em=$('email');
+  function msg(el,t){el.textContent=t;el.hidden=!t}
+  function post(url,data){
+    var fd=new FormData(); fd.append('csrf',f.csrf.value); for(var k in data)fd.append(k,data[k]);
+    return fetch(url,{method:'POST',body:fd,credentials:'same-origin',headers:{'Accept':'application/json'}}).then(function(r){return r.json()}).catch(function(){return {ok:false,msg:'Network error. Please try again.'}});
+  }
+  if(OTP){
+    em.addEventListener('input',function(){ if(verified){verified=false;$('subBtn').disabled=true;$('otpOk').hidden=true;$('gen').hidden=false} });
+    var cd=0,timer=null;
+    function cool(){cd=30;var b=$('regen');b.disabled=true;clearInterval(timer);timer=setInterval(function(){cd--;if(cd<=0){clearInterval(timer);b.disabled=false;b.textContent='Regenerate Code'}else b.textContent='Regenerate Code ('+cd+'s)'},1000)}
+    function gen(btn){
+      msg($('otpErr'),''); btn.disabled=true;
+      post('/request-access/otp',{email:em.value.trim()}).then(function(j){
+        btn.disabled=false;
+        if(!j.ok){msg($('otpErr'),j.msg||'Could not send the code.');return}
+        $('otpBox').hidden=false;$('sentMsg').textContent=j.msg;$('gen').hidden=true;$('code').value='';$('code').focus();cool();
+      });
+    }
+    $('gen').onclick=function(){gen(this)}; $('regen').onclick=function(){gen(this)};
+    $('ver').onclick=function(){
+      var b=this;msg($('otpErr'),'');b.disabled=true;
+      post('/request-access/verify',{email:em.value.trim(),code:$('code').value}).then(function(j){
+        b.disabled=false;
+        if(!j.ok){msg($('otpErr'),j.msg||'Verification failed.');return}
+        verified=true;$('otpBox').hidden=true;$('otpOk').hidden=false;$('subBtn').disabled=false;
+      });
+    };
+  }
+  function bad(el,t){el.setCustomValidity(t);el.reportValidity();el.setCustomValidity('');return false}
+  window.WZ={
+    validate:function(i){
+      if(i===1){
+        if($('pw').value!==$('pw2').value) return bad($('pw2'),'Passwords do not match');
+        if(!/^\+?[\d\s\-()]{7,20}$/.test(f.phone.value)) return bad(f.phone,'Enter a valid mobile number');
+      }
+      if(i===2){
+        if(!/^[2-9]\d{3}\s?\d{4}\s?\d{4}$/.test($('aadhaar').value.trim())) return bad($('aadhaar'),'Enter a valid 12-digit Aadhaar number');
+        if(!/^[A-Z]{5}\d{4}[A-Z]$/.test($('pan').value)) return bad($('pan'),'Enter a valid PAN, e.g. ABCDE1234F');
+        if(!fileOk.aadhaar_file){ $('aadhaar_info').className='upl-info err'; if(!$('aadhaar_file').files.length)$('aadhaar_info').innerHTML='<span>Please upload your Aadhaar card.</span>'; $('aadhaar_file').scrollIntoView({block:'center'}); return false }
+        if(!fileOk.pan_file){ $('pan_info').className='upl-info err'; if(!$('pan_file').files.length)$('pan_info').innerHTML='<span>Please upload your PAN card.</span>'; $('pan_file').scrollIntoView({block:'center'}); return false }
+      }
+      if(i===LAST&&OTP&&!verified){msg($('otpErr'),'Please verify your email first (Generate, enter the code, then Verify).');return false}
+      return true;
+    },
+    onShow:function(i){ if(i===LAST&&OTP){$('emTo').textContent=em.value.trim()||'—'} }
+  };
+})();
+</script>
+<script src="{{ url_for('static',filename='wizard.js') }}?v={{ asset_v }}"></script>
+{% endblock %}

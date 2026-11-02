@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block footer %}{% endblock %}
+{% block title %}Forgot password · Tuneflix{% endblock %}
+{% block body %}<link rel="stylesheet" href="{{ url_for('static',filename='wizard.css') }}?v={{ asset_v }}"><div class="authwrap"><div class="form"><a href="/" class="logo authlogo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a><form method="post">{{ tk() }}<h1>Forgot password?</h1><p class="m">Enter your registered email and we will send you a link to reset your password.</p>
+<label>Email</label><input type="email" name="email" required autofocus><button class="btn p">Send reset link</button></form>
+<p class="m" style="margin-top:18px"><a href="/login" style="color:var(--red2)">← Back to Sign in</a></p></div></div>{% endblock %}

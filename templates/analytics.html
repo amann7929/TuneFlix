@@ -1,0 +1,4 @@
+{% extends "app.html" %}{% block title %}Analytics{% endblock %}
+{% macro bars(t,d) %}<div class="card"><h3>{{ t }}</h3>{% set mx=(d|map(attribute=1)|max) if d else 1 %}{% for k,n in d %}<div style="display:flex;justify-content:space-between"><span>{{ k }}</span><b>{{ n }}</b></div><div class="bar"><i style="width:{{ n*100//mx }}%"></i></div>{% else %}<p class="empty">No data yet.</p>{% endfor %}</div>{% endmacro %}
+{% block body %}<div class="head"><h1 class="pt">Analytics</h1><span class="mu">{{ reqs }} service requests so far</span></div>
+<div class="two" style="grid-template-columns:1fr 1fr">{{ bars('Releases by status',by) }}{{ bars('Releases by month',mon) }}</div>{{ bars('Top genres',gen) }}{% endblock %}

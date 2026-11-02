@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+# local data (users, uploads) - on Render use a Disk + DATA_DIR instead
+data/

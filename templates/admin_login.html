@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block footer %}{% endblock %}
+{% block title %}Admin sign in · Tuneflix{% endblock %}
+{% block body %}<link rel="stylesheet" href="{{ url_for('static',filename='wizard.css') }}?v={{ asset_v }}"><div class="authwrap"><div class="form"><a href="/" class="logo authlogo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a><form method="post">{{ tk() }}<div class="tick" style="margin:0 0 18px">{{ ic('admin','w') }}</div><h1>Admin sign in</h1><p class="m">Restricted area. Only administrators can continue.</p>
+<label>Admin email</label><input type="email" name="email" required autofocus><label>Password</label><input type="password" name="password" required><button class="btn p">Sign in to admin</button></form>
+<p class="m" style="margin-top:18px"><a href="/" style="color:var(--red2)">← Back to Home</a></p></div></div>{% endblock %}

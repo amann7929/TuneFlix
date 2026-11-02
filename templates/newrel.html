@@ -1,0 +1,132 @@
+{% extends "app.html" %}{% block title %}Release Music{% endblock %}
+{% block body %}{% set start = start|default(0) %}
+<link rel="stylesheet" href="{{ url_for('static',filename='wizard.css') }}?v={{ asset_a }}">
+<div class="head"><h1 class="pt" style="display:flex;align-items:center;gap:12px"><span class="tile" style="margin:0;width:48px;height:48px;background:linear-gradient(135deg,#e30e0e,#ff4d3d)">{{ ic('catalog','w') }}</span>Release Music</h1></div>
+<form class="card f wz" method="post" enctype="multipart/form-data" novalidate id="rel">{{ tk() }}
+<div data-wiz data-start="{{ start }}">
+ <div class="wz-tabs" role="tablist">
+  <button type="button" class="wz-tab"><i>1</i>Release Music</button>
+  <button type="button" class="wz-tab"><i>2</i>Release Info</button>
+  <button type="button" class="wz-tab"><i>3</i>Track Info</button>
+  <button type="button" class="wz-tab"><i>4</i>Upload Track</button>
+  <button type="button" class="wz-tab"><i>5</i>Store</button>
+ </div>
+
+ <!-- 1. Release Music -->
+ <div class="wz-pane">
+  <div class="g2c">
+   <div><label>Release title <b class="req">*</b></label><input name="title" value="{{ v.get('title','') }}" required maxlength="150"></div>
+   <div><label>Version / subtitle</label><input name="version" value="{{ v.get('version','') }}" maxlength="100" placeholder="e.g. Remix, Lo-Fi, Acoustic"></div>
+   <div><label>Primary artist <b class="req">*</b></label><input name="artist" list="al" value="{{ v.get('artist','') }}" required maxlength="150"><datalist id="al">{% for a in artists %}<option value="{{ a.name }}">{% endfor %}</datalist></div>
+   <div><label>Featuring</label><input name="featuring" value="{{ v.get('featuring','') }}" maxlength="150"></div>
+   <div><label>Label</label><input name="label" list="ll" value="{{ v.get('label','') }}" maxlength="150"><datalist id="ll">{% for a in labels %}<option value="{{ a.name }}">{% endfor %}</datalist></div>
+   <div><label>Release type</label><input value="Single (1 audio track)" disabled></div>
+  </div>
+  <label>Cover art <b class="req">*</b> (JPG / PNG, square, min 1400×1400 px)</label>
+  <div class="drop"><b>Upload your artwork</b><small>Use 3000×3000 px for best quality on all stores. No logos of other stores, no blurry images.</small><br><input type="file" name="cover" id="cover" accept="image/jpeg,image/png,image/webp">
+   <div class="cvp" id="cvp"><img id="cvimg" alt=""><div id="cvinfo"></div></div></div>
+ </div>
+
+ <!-- 2. Release Info -->
+ <div class="wz-pane" hidden>
+  <div class="g2c">
+   <div><label>Genre <b class="req">*</b></label><select name="genre" required><option value="">- Select -</option>{% for g in genres %}<option {{ 'selected' if v.get('genre')==g }}>{{ g }}</option>{% endfor %}</select></div>
+   <div><label>Sub-genre</label><input name="subgenre" value="{{ v.get('subgenre','') }}" maxlength="80"></div>
+   <div><label>Release language <b class="req">*</b></label><select name="language" required><option value="">- Select -</option>{% for g in langs %}<option {{ 'selected' if v.get('language')==g }}>{{ g }}</option>{% endfor %}</select></div>
+   <div><label>Release date <b class="req">*</b></label><input type="date" name="release_date" value="{{ v.get('release_date','') }}" required></div>
+   <div><label>Original release date</label><input type="date" name="original_date" value="{{ v.get('original_date','') }}"></div>
+   <div><label>UPC / EAN <span style="opacity:.7">(blank = auto-assigned)</span></label><input name="upc" value="{{ v.get('upc','') }}" inputmode="numeric" maxlength="13" placeholder="12 or 13 digits"></div>
+   <div><label>℗ line (phonogram) <b class="req">*</b></label><input name="p_line" value="{{ v.get('p_line','') }}" required maxlength="120" placeholder="e.g. 2026 Your Label"></div>
+   <div><label>© line (composition) <b class="req">*</b></label><input name="c_line" value="{{ v.get('c_line','') }}" required maxlength="120" placeholder="e.g. 2026 Your Label"></div>
+  </div>
+  <label>Description / notes for our team</label><textarea name="description" rows="3" maxlength="800">{{ v.get('description','') }}</textarea>
+ </div>
+
+ <!-- 3. Track Info -->
+ <div class="wz-pane" hidden>
+  <div class="g2c">
+   <div><label>Track title <b class="req">*</b></label><input name="track_title" value="{{ v.get('track_title','') }}" required maxlength="150"></div>
+   <div><label>ISRC <span style="opacity:.7">(blank = auto-assigned)</span></label><input name="isrc" value="{{ v.get('isrc','') }}" maxlength="15" placeholder="INA012300001"></div>
+   <div><label>Primary track type <b class="req">*</b></label><select name="primary_type" required><option value="">- Select -</option>{% for g in ptypes %}<option {{ 'selected' if v.get('primary_type')==g }}>{{ g }}</option>{% endfor %}</select></div>
+   <div><label>Secondary track type <b class="req">*</b></label><select name="secondary_type" required><option value="">- Select -</option>{% for g in stypes %}<option {{ 'selected' if v.get('secondary_type')==g }}>{{ g }}</option>{% endfor %}</select></div>
+   <div><label>Instrumental <b class="req">*</b></label><select name="instrumental" required><option value="">- Select -</option>{% for g in yesno %}<option {{ 'selected' if v.get('instrumental')==g }}>{{ g }}</option>{% endfor %}</select></div>
+   <div><label>Is this track a key track for the release? <b class="req">*</b></label><select name="key_track" required><option value="">- Select -</option>{% for g in yesno %}<option {{ 'selected' if v.get('key_track')==g }}>{{ g }}</option>{% endfor %}</select></div>
+   <div><label>Music publisher <b class="req">*</b></label><input name="publisher" value="{{ v.get('publisher','') }}" required maxlength="120" placeholder="Music Publisher"></div>
+   <div><label>Track language <b class="req">*</b></label><select name="track_language" required><option value="">- Select -</option>{% for g in langs %}<option {{ 'selected' if v.get('track_language')==g }}>{{ g }}</option>{% endfor %}</select></div>
+   <div><label>Parental advisory <b class="req">*</b></label><select name="advisory" required><option value="">- Select -</option>{% for g in advisory %}<option {{ 'selected' if v.get('advisory')==g }}>{{ g }}</option>{% endfor %}</select></div>
+   <div><label>Film director</label><input name="film_director" value="{{ v.get('film_director','') }}" maxlength="120" placeholder="Film Director"></div>
+   <div><label>Music director <b class="req">*</b></label><input name="music_director" value="{{ v.get('music_director','') }}" required maxlength="120" placeholder="Music Director"></div>
+   <div><label>Lyricist <b class="req">*</b></label><input name="lyricist" value="{{ v.get('lyricist','') }}" required maxlength="120"></div>
+   <div><label>Composer <b class="req">*</b></label><input name="composer" value="{{ v.get('composer','') }}" required maxlength="120"></div>
+   <div><label>Producer</label><input name="producer" value="{{ v.get('producer','') }}" maxlength="120"></div>
+  </div>
+  <label>Lyrics <span style="opacity:.7">(optional)</span></label><textarea name="lyrics" rows="4" maxlength="8000">{{ v.get('lyrics','') }}</textarea>
+ </div>
+
+ <!-- 4. Upload Track -->
+ <div class="wz-pane" hidden>
+  <label>Audio file <b class="req">*</b> (WAV recommended · MP3, FLAC, M4A, AAC also accepted · max 200 MB)</label>
+  <div class="drop"><b>Upload your track</b><small>Use the final master, without clipping or silence at the start.</small><br><input type="file" name="audio" id="audio" accept="audio/*,.wav,.mp3,.flac,.m4a,.aac">
+   <div id="aup" style="display:none;margin-top:12px;font-size:13.5px"><span id="ainfo"></span></div></div>
+  <div class="g2c"><div><label>Preview start (seconds)</label><input name="preview_start" type="number" min="0" max="3600" step="1" value="{{ v.get('preview_start','') }}" placeholder="e.g. 30"></div></div>
+ </div>
+
+ <!-- 5. Store -->
+ <div class="wz-pane" hidden>
+  <label class="sall"><input type="checkbox" id="all"> Select All</label>
+  <div class="stg">{% for k,n,c in stores %}<label class="st"><input type="checkbox" name="stores" value="{{ k }}" {{ 'checked' if k in chosen }}><em style="background:{{ c }}">{{ n[0] }}</em><span>{{ n }}</span></label>{% endfor %}</div>
+  <p class="hint" style="margin-top:12px">Your release is delivered only to the stores you select.</p>
+ </div>
+
+ <div class="wz-nav"><button type="button" class="btn o wz-prev" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg> Previous</button><span class="sp2"></span>
+  <button type="button" class="btn wz-next">Next <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+  <span class="wz-sub" hidden><button class="btn">Submit release <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button></span></div>
+</div></form>
+<script>
+(function(){
+  var f=document.getElementById('rel');
+  function $(i){return document.getElementById(i)}
+  var cvOk=false;
+  $('cover').addEventListener('change',function(){
+    var file=this.files[0],box=$('cvp'),inf=$('cvinfo');cvOk=false;
+    if(!file){box.classList.remove('show');return}
+    if(!/^image\/(jpeg|png|webp)$/.test(file.type)){inf.textContent='Please choose a JPG or PNG image.';box.classList.add('show');return}
+    var url=URL.createObjectURL(file),im=$('cvimg');
+    im.onload=function(){
+      var w=im.naturalWidth,h=im.naturalHeight;
+      if(w!==h){inf.innerHTML='<b style="color:#e5484d">Cover must be square.</b> This image is '+w+'×'+h+' px.'}
+      else if(w<1400){inf.innerHTML='<b style="color:#e5484d">Cover is too small.</b> '+w+'×'+h+' px, minimum is 1400×1400.'}
+      else{cvOk=true;inf.innerHTML='<b style="color:#12b076">Looks good.</b> '+w+'×'+h+' px'}
+      box.classList.add('show');
+    };
+    im.src=url;
+  });
+  $('audio').addEventListener('change',function(){
+    var file=this.files[0],b=$('aup'),i=$('ainfo');
+    if(!file){b.style.display='none';return}
+    var mb=(file.size/1048576).toFixed(1);b.style.display='block';
+    if(file.size>200*1048576)i.innerHTML='<b style="color:#e5484d">File is larger than 200 MB.</b>';
+    else{i.textContent='';var n=document.createElement('b');n.textContent=file.name;i.appendChild(n);i.appendChild(document.createTextNode(' · '+mb+' MB'))}
+  });
+  var all=$('all'),boxes=[].slice.call(f.querySelectorAll('input[name=stores]'));
+  function syncAll(){all.checked=boxes.every(function(b){return b.checked})}
+  all.addEventListener('change',function(){boxes.forEach(function(b){b.checked=all.checked})});
+  boxes.forEach(function(b){b.addEventListener('change',syncAll)});syncAll();
+  function bad(el,t){el.setCustomValidity(t);el.reportValidity();el.setCustomValidity('');return false}
+  window.WZ={validate:function(i){
+    if(i===0){
+      var c=$('cover'); if(!c.files.length) return bad(c,'Please upload your cover art.');
+      if(!cvOk) return bad(c,'Cover art must be a square JPG/PNG of at least 1400×1400 px.');
+    }
+    if(i===3){
+      var a=$('audio'); if(!a.files.length) return bad(a,'Please upload your audio file.');
+      if(!/\.(wav|mp3|flac|m4a|aac)$/i.test(a.files[0].name)) return bad(a,'Allowed formats: WAV, MP3, FLAC, M4A, AAC.');
+      if(a.files[0].size>200*1048576) return bad(a,'File is larger than 200 MB.');
+    }
+    if(i===4&&!boxes.some(function(b){return b.checked})) return bad(boxes[0],'Select at least one store.');
+    return true;
+  }};
+})();
+</script>
+<script src="{{ url_for('static',filename='wizard.js') }}?v={{ asset_a }}"></script>
+{% endblock %}

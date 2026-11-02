@@ -1,0 +1,4 @@
+{% extends "app.html" %}{% from "_m.html" import card %}{% block title %}Catalog{% endblock %}
+{% block body %}<div class="head"><h1 class="pt">All Releases</h1><a class="btn" href="/catalog/new">{{ ic('plus','w') }} New Release</a></div>
+<form class="card" style="display:flex;gap:12px;flex-wrap:wrap"><input name="q" value="{{ q }}" placeholder="Search title or artist" style="flex:1;min-width:200px"><select name="status" style="width:auto"><option value="">All status</option><option value="live" {{ 'selected' if st=='live' }}>Delivered</option><option value="review" {{ 'selected' if st=='review' }}>In review</option><option value="rejected" {{ 'selected' if st=='rejected' }}>Rejected</option></select><button class="btn">Filter</button></form>
+<div class="rg">{% for r in rows %}{{ card(r) }}{% else %}<div class="card empty" style="grid-column:1/-1">No releases found.</div>{% endfor %}</div>{% endblock %}

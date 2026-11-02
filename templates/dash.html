@@ -1,0 +1,13 @@
+{% extends "app.html" %}{% from "_m.html" import card, avatar %}
+{% block body %}
+<div class="card who"><b style="display:flex;align-items:center;gap:8px">{{ ic('artists') }} Logged in as:</b><span>{{ u.name }}</span><em class="role">{{ 'ADMIN' if u.is_admin else 'USER' }}</em><span style="display:flex;align-items:center;gap:8px">{{ ic('catalog') }} {{ total }} releases</span></div>
+<div class="head"><h1 class="pt">Dashboard</h1><a class="btn" href="/catalog/new">{{ ic('plus','w') }} New Release</a></div>
+<div class="card hello">{{ avatar(u,84) }}<div><small>{{ today }}</small><h2>Welcome, {{ (u.name.split() or ['there'])[0] }}</h2></div><div class="tile" style="background:linear-gradient(135deg,#e30e0e,#ff4d3d)">{{ ic('hello','w') }}</div></div>
+<div class="stats">
+<div class="card"><div><small>Live Releases</small><h3>{{ live }}</h3></div><div class="tile" style="background:linear-gradient(135deg,#12b886,#0b8a5c)">{{ ic('live','w') }}</div></div>
+<div class="card"><div><small>In Review</small><h3>{{ '%02d'|format(review) }}</h3></div><div class="tile" style="background:linear-gradient(135deg,#6a5cff,#8e7bff)">{{ ic('review','w') }}</div></div>
+<div class="card"><div><small>Wallet</small><h3>₹{{ '%.0f'|format(bal) }}</h3></div><div class="tile" style="background:linear-gradient(135deg,#f0457d,#e0245e)">{{ ic('wallet','w') }}</div></div>
+<div class="card"><div><small>Open Requests</small><h3>{{ '%02d'|format(pend) }}</h3></div><div class="tile" style="background:linear-gradient(135deg,#f59f00,#e8590c)">{{ ic('change-requests','w') }}</div></div></div>
+<div class="strip"><b>{{ ic('catalog','r') }} RECENT RELEASES</b><a class="btn o" href="/catalog">VIEW ALL →</a></div>
+<div class="rg">{% for r in recent %}{{ card(r) }}{% else %}<div class="card empty" style="grid-column:1/-1">No releases yet. <a href="/catalog/new" style="color:var(--ac);font-weight:700">Create your first release →</a></div>{% endfor %}</div>
+{% endblock %}

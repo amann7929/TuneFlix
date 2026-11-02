@@ -1,0 +1,6 @@
+{% extends "app.html" %}{% block title %}My Wallet{% endblock %}
+{% block body %}<div class="head"><h1 class="pt">My Wallet</h1></div><div class="two"><div>
+<div class="card" style="background:linear-gradient(135deg,#17171d,#e30e0e);color:#fff"><small style="letter-spacing:.14em;opacity:.8">AVAILABLE BALANCE</small><h2 style="font-size:46px;margin-top:6px">₹{{ '{:,.2f}'.format(bal) }}</h2></div>
+<form class="card f" method="post"><h3>Request withdrawal</h3>{{ tk() }}<label>Amount (₹)</label><input name="amount" type="number" step="0.01" min="1" required><button class="btn">Withdraw</button></form></div>
+<div class="card"><h3>Transactions</h3><div class="tw"><table><tr><th>Date</th><th>Note</th><th>Amount</th></tr>{% for r in rows %}<tr><td class="mu">{{ r.created[:10] }}</td><td>{{ r.note }}</td><td style="font-weight:800;color:{{ '#12b076' if r.amount>0 else '#e5484d' }}">{{ '%+.2f'|format(r.amount) }}</td></tr>{% else %}<tr><td colspan="3" class="empty">No transactions yet. Royalties credited by our team appear here.</td></tr>{% endfor %}</table></div>
+{% if wd %}<h3 style="margin-top:22px">Withdrawals</h3><table>{% for r in wd %}<tr><td>{{ r.subject }}</td><td><span class="tag {{ r.status }}">{{ r.status }}</span></td></tr>{% endfor %}</table>{% endif %}</div></div>{% endblock %}

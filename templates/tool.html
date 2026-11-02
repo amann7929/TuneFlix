@@ -1,0 +1,16 @@
+{% extends "app.html" %}{% block title %}Audio Tool{% endblock %}
+{% block body %}{% set ex=(m=='extractor') %}<div class="head"><h1 class="pt">{{ 'Audio Extractor' if ex else 'Audio Converter' }}</h1></div>
+<div class="card f" style="max-width:640px"><p class="mu">{{ 'Pull the audio track out of a video (MP4, MOV, WEBM) as WAV.' if ex else 'Convert any audio file to a studio-ready WAV.' }} Runs in your browser; the file is never uploaded.</p>
+<label>File</label><input type="file" id="file" accept="{{ 'video/*,audio/*' if ex else 'audio/*,video/*' }}">
+<div class="g2c"><div><label>Sample rate</label><select id="rate"><option>44100</option><option>48000</option></select></div><div><label>Channels</label><select id="chs"><option value="2">Stereo</option><option value="1">Mono</option></select></div></div>
+<button class="btn" type="button" onclick="run()">{{ 'Extract audio' if ex else 'Convert to WAV' }}</button> <a id="dl" class="btn o" style="display:none;margin-top:22px">{{ ic('download') }} Download WAV</a><p id="st" class="mu" style="margin-top:14px"></p></div>
+<script>
+const $=i=>document.getElementById(i),say=t=>$('st').textContent=t;
+async function run(){const f=$('file').files[0];if(!f)return say('Choose a file first.');say('Processing…');
+try{const ac=new(window.AudioContext||window.webkitAudioContext)(),src=await ac.decodeAudioData(await f.arrayBuffer()),sr=+$('rate').value,ch=Math.min(+$('chs').value,src.numberOfChannels);
+const off=new OfflineAudioContext(ch,Math.ceil(src.duration*sr),sr),s=off.createBufferSource();s.buffer=src;s.connect(off.destination);s.start();const out=await off.startRendering(),n=out.length,cd=[...Array(ch)].map((_,c)=>out.getChannelData(c)),d=new DataView(new ArrayBuffer(44+n*ch*2)),w=(o,t)=>[...t].forEach((c,i)=>d.setUint8(o+i,c.charCodeAt(0)));
+w(0,'RIFF');d.setUint32(4,36+n*ch*2,true);w(8,'WAVEfmt ');d.setUint32(16,16,true);d.setUint16(20,1,true);d.setUint16(22,ch,true);d.setUint32(24,sr,true);d.setUint32(28,sr*ch*2,true);d.setUint16(32,ch*2,true);d.setUint16(34,16,true);w(36,'data');d.setUint32(40,n*ch*2,true);
+let p=44;for(let i=0;i<n;i++)for(let c=0;c<ch;c++){const v=Math.max(-1,Math.min(1,cd[c][i]));d.setInt16(p,v<0?v*32768:v*32767,true);p+=2}
+const a=$('dl');a.href=URL.createObjectURL(new Blob([d],{type:'audio/wav'}));a.download=f.name.replace(/\.[^.]+$/,'')+'.wav';a.style.display='inline-flex';say('Done: '+out.duration.toFixed(1)+' s at '+sr+' Hz.')}
+catch(e){say('Could not decode this file. Try WAV, MP3, M4A or MP4.')}}
+</script>{% endblock %}

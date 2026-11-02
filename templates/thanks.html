@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block footer %}{% endblock %}
+{% block title %}Thank you · Tuneflix{% endblock %}
+{% block body %}<link rel="stylesheet" href="{{ url_for('static',filename='wizard.css') }}?v={{ asset_v }}"><div class="authwrap"><div class="form" style="text-align:center"><div class="tick">{{ ic('oac-spotify-tick','w') }}</div><a href="/" class="logo authlogo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a><h1>Thanks!</h1>
+<p class="m" style="margin-bottom:10px">Your registration has been completed!<br>We will inform you once your details are verified.</p>{% if company %}<p class="m" style="font-size:13.5px">(Please keep your <b>Authorized Signatory signature</b> in PNG format ready, to sign the agreement with our company.)</p>{% endif %}
+<a class="btn p" href="/" style="display:block;text-align:center">Back to Home</a><a class="btn g" href="/login" style="display:block;text-align:center;margin-top:12px">Sign in</a></div></div>{% endblock %}

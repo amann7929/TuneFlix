@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block footer %}{% endblock %}
+{% block title %}Reset password · Tuneflix{% endblock %}
+{% block body %}<link rel="stylesheet" href="{{ url_for('static',filename='wizard.css') }}?v={{ asset_v }}"><div class="authwrap"><div class="form"><a href="/" class="logo authlogo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a><form method="post">{{ tk() }}<h1>Set a new password</h1><p class="m">Choose a strong password you have not used before.</p>
+<label>New password</label><input type="password" name="password" minlength="6" required autofocus><label>Confirm password</label><input type="password" name="confirm" minlength="6" required><button class="btn p">Change password</button></form></div></div>{% endblock %}

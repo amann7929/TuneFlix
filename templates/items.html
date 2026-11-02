@@ -1,0 +1,4 @@
+{% extends "app.html" %}{% block title %}{{ title }}{% endblock %}
+{% block body %}<div class="head"><h1 class="pt">{{ title }}</h1></div><div class="two">
+<form class="card f" method="post"><h3>Add new</h3>{{ tk() }}<label>{{ l1 }}</label><input name="name" required><label>{{ l2 }}</label><input name="detail"><button class="btn">Add</button></form>
+<div class="card"><div class="tw"><table><tr><th>Name</th><th>Details</th>{% if title=='Labels' %}<th>Status</th>{% endif %}<th></th></tr>{% for r in rows %}<tr><td><b>{{ r.name }}</b></td><td class="mu">{{ r.detail or '—' }}</td>{% if title=='Labels' %}<td><span class="tag {{ r.status }}">{{ r.status|title }}</span></td>{% endif %}<td><form method="post" action="/del/items/{{ r.id }}">{{ tk() }}<button class="del">Delete</button></form></td></tr>{% else %}<tr><td colspan="{{ 4 if title=='Labels' else 3 }}" class="empty">Nothing here yet.</td></tr>{% endfor %}</table></div></div></div>{% endblock %}

@@ -1,0 +1,1 @@
+Each icon is a file. To use your own image, drop NAME.png here (e.g. wallet.png). A PNG with the base name overrides ALL variants (name, name-w white, name-r red). Social logos: instagram, youtube, x, linkedin.

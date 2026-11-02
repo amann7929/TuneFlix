@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Tuneflix — Music Distribution to 200+ Stores, No Upfront Fee{% endblock %}</title>
+<link rel="icon" type="image/png" href="{{ url_for('static',filename='favicon.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static',filename='apple-touch-icon.png') }}">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="Tuneflix">
+<meta property="og:image" content="{{ url_for('static',filename='logo-square.png',_external=True) }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}?v={{ asset_v }}">
+</head>
+<body>
+<header><div class="wrap"><nav>
+ <a href="/" class="logo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a>
+ <div class="links" id="links">{% for t,h in [('Artists','/for-artists'),('Labels','/for-labels'),('Services','/services'),('API','/developers'),('Guides','/guides')] %}<a href="{{ h }}" class="{{ 'on' if request.path==h }}">{{ t }}</a>{% endfor %}{% if session.uid %}<a class="mob" href="/studio">Studio</a><a class="mob" href="/logout">Logout</a>{% else %}<a class="mob" href="/login">Sign in</a>{% endif %}</div>
+ <div class="right">{% if session.uid %}<a href="/studio" class="si">Studio</a><a href="/logout" class="si">Logout</a>{% else %}<a href="/login" class="si">Sign in</a>{% endif %}<button class="burger" onclick="document.getElementById('links').classList.toggle('open')">{{ ic('menu') }}</button></div>
+</nav></div></header>
+{% for c,m in get_flashed_messages(with_categories=true) %}<div class="flash {{c}}">{{m}}</div>{% endfor %}
+{% block body %}{% endblock %}
+{% block footer %}{% endblock %}
+
+<script>
+const b=document.getElementById('bars');if(b){
+const N=innerWidth<600?34:70;for(let i=0;i<N;i++){const e=document.createElement('i');e.style.setProperty('--h',(15+Math.random()*85)+'%');e.style.animationDelay=(-Math.random()*2)+'s';e.style.animationDuration=(1+Math.random()*1.5)+'s';b.appendChild(e)}
+const S=['Spotify','Apple Music','YouTube Music','Amazon Music','JioSaavn','Gaana','Instagram','Facebook','WhatsApp','TikTok','Snapchat','Deezer','Tidal','SoundCloud','Hungama','Boomplay'];
+document.getElementById('stores').innerHTML=S.map(s=>`<div class="pill">${s}<span class="live">LIVE</span></div>`).join('')+'<div class="pill">and 200+ more stores</div>';
+const m=S.map(s=>`<span>${s}</span>`).join('');document.getElementById('mq').innerHTML=m+m;}
+</script>
+</body>
+</html>

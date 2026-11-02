@@ -1,0 +1,56 @@
+{% extends "base.html" %}{% block body %}
+
+<section class="hero"><div class="bars" id="bars"></div><div class="wrap">
+ <div class="eyebrow">Music infrastructure, engineered.</div>
+ <h1>Release everywhere. <span>Own every play.</span></h1>
+ <p>Music infrastructure for the new era of AI: distribution, publishing, royalties and rights for artists, labels and the businesses that build on music.</p>
+ <div class="cta"><a href="/request-access" class="btn p">Register now</a><a href="/developers" class="btn g">For Businesses · API</a></div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+ <div class="eyebrow">The new era of AI</div>
+ <h2>Music now moves at the speed of AI. Every artist, label and team needs speed, fast execution, and infrastructure they can rely on.</h2>
+ <p class="sub">Tuneflix is that infrastructure: distribution, publishing, royalties, rights and your own API, built so your releases keep pace and your catalogue stays in order.</p>
+ <div class="stats">
+  <div class="stat"><b>700K<em>+</em></b><span>Assets delivered and managed</span></div>
+  <div class="stat"><b>$5M<em>+</em></b><span>Royalties paid out every year</span></div>
+  <div class="stat"><b>80K<em>+</em></b><span>Artists</span></div>
+  <div class="stat"><b>10K<em>+</em></b><span>Labels</span></div>
+  <div class="stat"><b>320K<em>+</em></b><span>Works registered with PROs</span></div>
+  <div class="stat"><b>30K<em>+</em></b><span>Social media creators</span></div>
+ </div>
+</div></section>
+
+
+
+
+
+<section><div class="wrap"><div class="eyebrow">Explore Tuneflix</div><h2>Everything in its own place.</h2><div class="grid">
+{% for i,t,d,h in [('artists','Artists','Release your music and get paid.','/for-artists'),('labels','Labels','Run a whole catalogue from one place.','/for-labels'),('globe','Services','Distribution, publishing, royalties, rights.','/services'),('developers','API','Build on Tuneflix with your own key.','/developers'),('oac-spotify-tick','Guides','Answers to the questions artists ask first.','/guides')] %}<a class="card" href="{{ h }}"><div class="ct">{{ ic(i,'w') }}</div><h3>{{ t }}</h3><p>{{ d }}</p></a>{% endfor %}</div></div></section>
+<section><div class="wrap">
+ <div class="eyebrow">Tonight’s setlist</div><h2>Release once. Go live everywhere.</h2>
+ <p class="sub">We deliver to Spotify, Apple Music, YouTube Music and 200+ more stores, and track each delivery until it is live. Live in 48 hours, max. Priority releases in under 24 hours.</p>
+ <div class="stores" id="stores"></div>
+</div></section>
+
+<div class="marq"><div id="mq"></div></div>
+
+<section><div class="wrap">
+ <div class="eyebrow">How joining works</div><h2>Start your first release in three steps.</h2>
+ <div class="steps">
+  <div class="step"><b>01</b><h3>Apply</h3><p>Tell us who you are and what you release.</p></div>
+  <div class="step"><b>02</b><h3>Reviewed by our team</h3><p>Every application is reviewed by our team.</p></div>
+  <div class="step"><b>03</b><h3>Onboard & release</h3><p>Approved applicants get an invite to Tuneflix Studio to onboard, release and follow their catalogue.</p></div>
+ </div>
+</div></section>
+
+
+
+<section class="final" id="access"><div class="wrap">
+ <div class="eyebrow">Invite-only</div><h2>Your next release starts here.</h2>
+ <p class="sub">Built for the new era of AI: speed, fast execution and infrastructure you can rely on.</p>
+ <a href="/request-access" class="btn p">Register now →</a>
+</div></section>
+
+{% endblock %}
+{% block footer %}{% include "_footer.html" %}{% endblock %}

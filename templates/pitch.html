@@ -1,0 +1,8 @@
+{% extends "app.html" %}{% block title %}Pitch Writer{% endblock %}
+{% block body %}<div class="head"><h1 class="pt">Pitch Writer</h1></div><div class="two" style="grid-template-columns:1fr 1fr">
+<div class="card f"><p class="mu">Fill in the details and get a ready-to-send playlist pitch. Template based, runs in your browser.</p>
+<div class="g2c"><div><label>Artist</label><input id="artist"></div><div><label>Track title</label><input id="title"></div><div><label>Genre</label><input id="genre"></div><div><label>Mood</label><input id="mood"></div><div><label>Release date</label><input id="date" type="date"></div><div><label>Similar artists</label><input id="sim"></div></div>
+<label>Story behind the song</label><textarea id="story" rows="4"></textarea><button class="btn" type="button" onclick="gen()">Generate pitch</button></div>
+<div class="card f"><h3>Your pitch</h3><textarea id="out" rows="15" style="margin-top:12px"></textarea><button class="btn o" type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('out').value)">Copy</button></div></div>
+<script>function gen(){const v=i=>document.getElementById(i).value.trim();
+document.getElementById('out').value=`Subject: Pitch: ${v('title')} by ${v('artist')}\n\nHi team,\n\nI'd like to share "${v('title')}", a ${v('mood')||'fresh'} ${v('genre')} track by ${v('artist')}, releasing on ${v('date')||'(date to be confirmed)'}.\n\n${v('story')}\n\nListeners of ${v('sim')||'similar artists'} will connect with it, and we would love it to be considered for your playlists.\n\nThank you,\n${v('artist')}`}</script>{% endblock %}

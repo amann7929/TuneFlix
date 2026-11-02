@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{% block title %}Dashboard{% endblock %} · Tuneflix Studio</title><link rel="icon" type="image/png" href="{{ url_for('static',filename='favicon.png') }}"><link rel="apple-touch-icon" href="{{ url_for('static',filename='apple-touch-icon.png') }}"><meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="{{ url_for('static',filename='app.css') }}?v={{ asset_a }}">
+<script>try{if(localStorage.getItem('tf-theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script></head>
+{% from "_m.html" import avatar %}
+<body><div class="ov" onclick="document.body.classList.remove('nav')"></div>
+<aside><div class="brand"><a class="logo" href="/"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a><small>Music Distributor</small></div>
+<a class="create" href="/catalog/new">{{ ic('plus','w') }} CREATE RELEASE</a>
+<nav>{% for sec,its in NAV %}<div class="sec">{{ sec }}</div>
+{% for it in its %}{% if it.sub %}{% set ns=namespace(o=false) %}{% for t,h in it.sub %}{% if request.path==h %}{% set ns.o=true %}{% endif %}{% endfor %}
+<div class="grp {{ 'open' if ns.o }}"><button class="ni" onclick="this.parentNode.classList.toggle('open')"><i>{{ ic(it.ic,'r' if ns.o else '') }}</i>{{ it.t }}<b>{{ ic('chevron') }}</b></button><div class="subs">{% for t,h in it.sub %}<a class="si {{ 'on' if request.path==h }}" href="{{ h }}">{{ t }}</a>{% endfor %}</div></div>
+{% elif it.g %}<a class="tool {{ 'on' if request.path==it.h }}" href="{{ it.h }}"><i class="g{{ it.g }}">{{ ic(it.ic,'w') }}</i><span><b>{{ it.t }}</b><small>{{ it.s }}</small></span>{% if it.new %}<em>NEW</em>{% endif %}</a>
+{% else %}<a class="ni {{ 'on' if request.path==it.h }}" href="{{ it.h }}"><i>{{ ic(it.ic,'r' if request.path==it.h else '') }}</i>{{ it.t }}</a>{% endif %}{% endfor %}
+{% if sec=='Account' and u.is_admin %}<a class="ni {{ 'on' if request.path=='/admin' }}" href="/admin"><i>{{ ic('admin','r' if request.path=='/admin' else '') }}</i>Admin Panel</a>{% endif %}{% endfor %}</nav>
+<div class="me">{{ avatar(u) }}<div><b>{{ u.name }}</b><small>{{ 'ADMIN' if u.is_admin else 'USER' }}</small></div><a href="/logout" title="Logout">{{ ic('logout') }}</a></div></aside>
+<div class="main"><header class="top"><button class="ib hb" onclick="document.body.classList.add('nav')">{{ ic('menu') }}</button>
+<form class="sbox" id="sb" action="/catalog"><input name="q" placeholder="Search releases…"></form><span class="sp"></span>
+<button class="ib sbtn" onclick="document.getElementById('sb').classList.toggle('show')">{{ ic('search') }}</button>
+{% set nt=notes() %}<div style="position:relative"><button class="ib" onclick="document.getElementById('pp').classList.toggle('show')">{{ ic('bell') }}{% if nt|length %}<i class="dot"></i>{% endif %}</button>
+<div class="pop" id="pp">{% for n in nt %}<div>{{ n.t }}<small>{{ n.created }}</small></div>{% else %}<div>No updates yet</div>{% endfor %}</div></div>
+<button class="ib" onclick="var d=document.documentElement,k=d.dataset.theme==='dark'?'light':'dark';d.dataset.theme=k;try{localStorage.setItem('tf-theme',k)}catch(e){}">{{ ic('theme') }}</button>
+<a href="/settings" class="ib">{{ avatar(u) }}</a></header>
+<main class="page">{% for c,m in get_flashed_messages(with_categories=true) %}<div class="flash {{ c }}">{{ m }}</div>{% endfor %}{% block body %}{% endblock %}</main></div>
+{% if welcome() %}<div class="wp" id="wp" onclick="if(event.target===this)closeWp()"><div class="wpc"><button class="wpx" onclick="closeWp()" aria-label="Close">✕</button>
+<img class="wpl" src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"><h2>Welcome back, {{ (u.name.split() or ['there'])[0] }}!</h2><p>{{ welcome_text }}</p><div class="wpb"><i></i></div></div></div>
+<script>function closeWp(){var e=document.getElementById('wp');if(e){e.classList.add('out');setTimeout(function(){e.remove()},350)}}setTimeout(closeWp,5000)</script>{% endif %}
+</body></html>

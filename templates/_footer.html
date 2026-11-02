@@ -1,0 +1,19 @@
+<footer class="lux"><div class="wrap">
+ <div class="lux-top">
+  <div class="lux-brand"><a href="/" class="logo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a>
+   <p>Music infrastructure, engineered.<br>Distribution, publishing, royalties and rights for the new era of AI.</p>
+   <div class="soc">{% for n,l in [('instagram','Instagram'),('youtube','YouTube'),('x','X'),('linkedin','LinkedIn')] %}<a href="{{ social[n] }}" target="_blank" rel="noopener">{{ ic(n) }}{{ l }}</a>{% endfor %}</div></div>
+  <a class="addr" href="https://www.google.com/maps/search/?api=1&query=Mithapur+Farm+Area+Dhalai+Road+Mithapur+Patna+Bihar+800001" target="_blank" rel="noopener">
+   <span class="ph"><img src="{{ url_for('static',filename='office.jpg') }}" alt="Head office"></span>
+   <div><h5>Rakesh Raj</h5>
+    <b>Mithapur Farm Area, Dhalai Road,</b><b>Mithapur, Patna, Bihar 800001,</b><b>India</b>
+    <em>View on map →</em></div></a>
+ </div>
+ <div class="fg">
+  <div><h4>Services</h4><a href="/services">Distribution</a><a href="/services">Publishing</a><a href="/services">Royalties</a><a href="/services">Rights</a></div>
+  <div><h4>Explore</h4><a href="/for-artists">Artists</a><a href="/for-labels">Labels</a><a href="/developers">API</a><a href="/guides">Guides</a></div>
+  <div><h4>Account</h4><a href="/login">Sign in</a><a href="/request-access">Register now</a><a href="/studio">Studio</a></div>
+  <div><h4>Legal</h4><a href="#">Privacy</a><a href="#">Terms</a></div>
+ </div>
+ <div class="fb"><span>© 2026 Tuneflix. All rights reserved.</span><span>Crafted in Patna, India <i style="color:var(--red)">●</i></span></div>
+</div></footer>

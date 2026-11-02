@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block title %}{{ 'Register' if signup else 'Sign in' }} — Tuneflix{% endblock %}
+{% block footer %}{% endblock %}
+{% block body %}<link rel="stylesheet" href="{{ url_for('static',filename='wizard.css') }}?v={{ asset_v }}"><div class="authwrap"><div class="form"><a href="/" class="logo authlogo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a><div style="display:flex;gap:8px;margin-bottom:22px"><a href="/login" class="btn {{ 'g' if signup else 'p' }}" style="flex:1;text-align:center;padding:10px">Sign in</a><a href="/request-access" class="btn {{ 'p' if signup else 'g' }}" style="flex:1;text-align:center;padding:10px">Register</a></div><form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">
+{% if signup %}<h1>Create your account</h1><p class="m">Free for everyone. Register and start releasing.</p>
+<label>Full name / label name</label><input name="name" required>
+<label>I am a</label><select name="kind"><option>Independent artist</option><option>Label / catalogue owner</option><option>Business (API)</option></select>
+{% else %}<h1>Sign in</h1><p class="m">Welcome back to Tuneflix Studio.</p>{% endif %}
+<label>Email</label><input type="email" name="email" required>
+<label>Password</label><input type="password" name="password" minlength="6" required>
+{% if not signup %}<a href="/forgot" style="display:block;text-align:right;margin-top:10px;font-size:13.5px;color:var(--red2)">Forgot password?</a>{% endif %}<button class="btn p">{{ 'Register now' if signup else 'Sign in' }}</button></form>
+<p class="m" style="margin-top:18px">{% if signup %}Already have an account? <a href="/login" style="color:var(--red2)">Sign in</a>{% else %}New here? <a href="/request-access" style="color:var(--red2)">Register now</a>{% endif %}</p></div></div>{% endblock %}
