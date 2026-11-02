@@ -73,9 +73,8 @@ STORE_LOGOS = {
     "gaana": "gaana.jpg", "ytmusic": "youtube-music.png", "spotify": "spotify.png",
     "tiktok": "tiktok.png", "youtube": "youtube-content-id.png", "hungama": "hungama-play.jpg",
     "apple": "apple-music.png", "amazon": "amazon-music.png", "instagram": "instagram.png",
-    "facebook": "facebook.png", "resso": "resso.png", "wynk": "wynk-music.png",
-    "deezer": "deezer.jpg", "tidal": "tidal.png", "soundcloud": "soundcloud.png",
-    "snapchat": "snapchat.jpg",
+    "resso": "resso.png", "wynk": "wynk-music.png", "deezer": "deezer.jpg",
+    "tidal": "tidal.png", "soundcloud": "soundcloud.png", "snapchat": "snapchat.jpg",
 }
 STORE_IDS = [x[0] for x in STORES]
 GENRES = ["Bollywood", "Pop", "Hip-Hop / Rap", "Indie / Alternative", "Rock", "Electronic / Dance", "Folk", "Devotional / Spiritual", "Classical", "Ghazal / Sufi", "Regional",
