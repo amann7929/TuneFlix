@@ -84,38 +84,29 @@
   <input name="revenue_6m" type="number" min="0" step="0.01" value="{{ v.get('revenue_6m','') }}" placeholder="0.00"></div>
  </div>
 
- <!-- 5. Email verification -->
+ <!-- 5. CAPTCHA verification -->
  <div class="wz-pane" hidden>
-  {% if otp_required() %}
-  <h3>Verify your email</h3><p class="hint">Please click to generate an email OTP for validation.</p>
+  <h3>Quick verification</h3><p class="hint">Solve the question below. It will verify automatically when you enter the answer.</p>
   <div class="ostep">
-   <div>Email will be sent to <b id="emTo">—</b></div>
-   <div><button type="button" class="btn p" id="gen" style="width:auto;margin:0">Generate</button></div>
-   <div id="otpBox" hidden>
-    <div class="note" id="sentMsg"></div>
-    <label>Verification code</label>
-    <div class="otp-row"><input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"><button type="button" class="btn p" id="ver">Verify</button></div>
-    <button type="button" class="linkb" id="regen">Regenerate Code</button>
-   </div>
-   <div class="bad" id="otpErr" hidden></div>
-   <div class="ok" id="otpOk" hidden>Your email verification is successful.<br>Please click <b>Submit</b> to complete your registration.</div>
+   <input type="hidden" name="captcha_token" id="captchaToken" value="{{ captcha.token }}">
+   <div class="captcha-question" id="captchaQuestion">{{ captcha.question }}</div>
+   <label for="captchaAnswer">Your answer</label>
+   <div class="captcha-row"><input id="captchaAnswer" inputmode="numeric" autocomplete="off" maxlength="2" pattern="[0-9]{2}" required placeholder="00"><button type="button" class="btn g captcha-refresh" id="captchaRefresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4.93 9A8 8 0 0 1 18.3 5.7L20 7M4 17v-5h5"/><path d="M19.07 15A8 8 0 0 1 5.7 18.3L4 17"/></svg><span>Refresh</span></button></div>
+   <div class="bad" id="captchaStatus" role="status" aria-live="polite" hidden></div>
+   <div class="ok" id="captchaOk" role="status" aria-live="polite" hidden>CAPTCHA verified. Please click <b>Submit</b> to complete your registration.</div>
   </div>
-  {% else %}
-  <h3>Ready to submit</h3>
-  <div class="ok">Everything is filled in. Please click <b>Submit</b> to complete your registration.</div>
-  {% endif %}
   <p class="hint" id="sigHint" style="margin-top:16px" hidden>Please keep your <b>Authorized Signatory signature</b> in PNG format ready, to sign the agreement with our company.</p>
  </div>
 
  <div class="wz-nav"><button type="button" class="btn g wz-prev" hidden>{{ ARL }}Previous</button><span class="sp2"></span>
   <button type="button" class="btn p wz-next">Next{{ ARR }}</button>
-  <span class="wz-sub" hidden><button class="btn p" id="subBtn" {{ 'disabled' if otp_required() }}>Submit{{ ARR }}</button></span></div>
+  <span class="wz-sub" hidden><button class="btn p" id="subBtn" disabled>Submit{{ ARR }}</button></span></div>
 </div></form>
 <p class="m" style="margin-top:20px;text-align:center">Already have an account? <a href="/login" style="color:var(--red2)">Sign in</a></p>
 </div></div>
 <script>
 (function(){
-  var f=document.getElementById('rf'), OTP={{ 'true' if otp_required() else 'false' }}, verified=false, LAST=4;
+  var f=document.getElementById('rf'), verified=false, LAST=4, captchaRequest=0;
   function $(i){return document.getElementById(i)}
   function acct(){var r=f.querySelector('[name=acct_type]:checked');return r?r.value:'Individual'}
   function ag(){var r=f.querySelector('[name=has_agreement]:checked');return r?r.value:'No'}
@@ -148,34 +139,31 @@
   }
   pick('aadhaar_file');pick('pan_file');
 
-  var em=$('email');
   function msg(el,t){el.textContent=t;el.hidden=!t}
   function post(url,data){
     var fd=new FormData(); fd.append('csrf',f.csrf.value); for(var k in data)fd.append(k,data[k]);
     return fetch(url,{method:'POST',body:fd,credentials:'same-origin',headers:{'Accept':'application/json'}}).then(function(r){return r.json()}).catch(function(){return {ok:false,msg:'Network error. Please try again.'}});
   }
-  if(OTP){
-    em.addEventListener('input',function(){ if(verified){verified=false;$('subBtn').disabled=true;$('otpOk').hidden=true;$('gen').hidden=false} });
-    var cd=0,timer=null;
-    function cool(){cd=30;var b=$('regen');b.disabled=true;clearInterval(timer);timer=setInterval(function(){cd--;if(cd<=0){clearInterval(timer);b.disabled=false;b.textContent='Regenerate Code'}else b.textContent='Regenerate Code ('+cd+'s)'},1000)}
-    function gen(btn){
-      msg($('otpErr'),''); btn.disabled=true;
-      post('/request-access/otp',{email:em.value.trim()}).then(function(j){
-        btn.disabled=false;
-        if(!j.ok){msg($('otpErr'),j.msg||'Could not send the code.');return}
-        $('otpBox').hidden=false;$('sentMsg').textContent=j.msg;$('gen').hidden=true;$('code').value='';$('code').focus();cool();
-      });
-    }
-    $('gen').onclick=function(){gen(this)}; $('regen').onclick=function(){gen(this)};
-    $('ver').onclick=function(){
-      var b=this;msg($('otpErr'),'');b.disabled=true;
-      post('/request-access/verify',{email:em.value.trim(),code:$('code').value}).then(function(j){
-        b.disabled=false;
-        if(!j.ok){msg($('otpErr'),j.msg||'Verification failed.');return}
-        verified=true;$('otpBox').hidden=true;$('otpOk').hidden=false;$('subBtn').disabled=false;
-      });
-    };
-  }
+  $('captchaAnswer').addEventListener('input',function(){
+    var answer=this.value, requestId=++captchaRequest;
+    verified=false;$('subBtn').disabled=true;$('captchaOk').hidden=true;
+    if(!/^\d{2}$/.test(answer)){msg($('captchaStatus'),'');return}
+    msg($('captchaStatus'),'Verifying…');
+    post('/request-access/captcha/verify',{captcha_token:$('captchaToken').value,answer:answer}).then(function(j){
+      if(requestId!==captchaRequest||$('captchaAnswer').value!==answer)return;
+      if(!j.ok){msg($('captchaStatus'),j.msg||'Verification failed.');return}
+      verified=true;$('captchaStatus').hidden=true;$('captchaOk').hidden=false;$('subBtn').disabled=false;
+    });
+  });
+  $('captchaRefresh').onclick=function(){
+    var b=this;b.disabled=true;verified=false;$('subBtn').disabled=true;$('captchaOk').hidden=true;
+    post('/request-access/captcha/new',{}).then(function(j){
+      b.disabled=false;
+      if(!j.ok||!j.captcha){msg($('captchaStatus'),j.msg||'Could not refresh CAPTCHA. Please try again.');return}
+      captchaRequest++;$('captchaToken').value=j.captcha.token;$('captchaQuestion').textContent=j.captcha.question;
+      $('captchaAnswer').value='';$('captchaAnswer').focus();msg($('captchaStatus'),'');
+    });
+  };
   function bad(el,t){el.setCustomValidity(t);el.reportValidity();el.setCustomValidity('');return false}
   window.WZ={
     validate:function(i){
@@ -189,10 +177,10 @@
         if(!fileOk.aadhaar_file){ $('aadhaar_info').className='upl-info err'; if(!$('aadhaar_file').files.length)$('aadhaar_info').innerHTML='<span>Please upload your Aadhaar card.</span>'; $('aadhaar_file').scrollIntoView({block:'center'}); return false }
         if(!fileOk.pan_file){ $('pan_info').className='upl-info err'; if(!$('pan_file').files.length)$('pan_info').innerHTML='<span>Please upload your PAN card.</span>'; $('pan_file').scrollIntoView({block:'center'}); return false }
       }
-      if(i===LAST&&OTP&&!verified){msg($('otpErr'),'Please verify your email first (Generate, enter the code, then Verify).');return false}
+      if(i===LAST&&!verified){msg($('captchaStatus'),'Please solve the CAPTCHA first.');return false}
       return true;
     },
-    onShow:function(i){ if(i===LAST&&OTP){$('emTo').textContent=em.value.trim()||'—'} }
+    onShow:function(){}
   };
 })();
 </script>

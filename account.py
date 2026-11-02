@@ -1,5 +1,5 @@
-import hashlib, hmac, os, re, secrets, time
-from flask import render_template, request, redirect, flash, session, jsonify
+import hashlib, os, secrets, time
+from flask import render_template, request, redirect, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import mailer
 
@@ -15,43 +15,6 @@ def setup(app, db, need):
 
     @app.route("/thanks")
     def thanks(): return render_template("thanks.html", company=session.get("reg_type") == "Company")
-
-    # ---- email OTP for registration (same flow as the reference page: Generate -> enter code -> Verify -> Submit) ----
-    EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
-    otp_hash = lambda email, code: hashlib.sha256((app.secret_key + "|" + email + "|" + code).encode()).hexdigest()
-
-    @app.route("/request-access/otp", methods=["POST"])
-    def otp_send():
-        email = request.form.get("email", "").strip().lower()
-        if not EMAIL_RE.match(email): return jsonify(ok=False, msg="Enter a valid email address."), 400
-        if db().execute("SELECT 1 FROM users WHERE email=?", (email,)).fetchone():
-            return jsonify(ok=False, msg="This email is already registered. Please sign in."), 409
-        now = time.time(); r = db().execute("SELECT * FROM email_otps WHERE email=?", (email,)).fetchone()
-        sends, win = (r["sends"] or 0, r["window_start"] or 0) if r else (0, 0)
-        if r and now - (r["sent_at"] or 0) < 30: return jsonify(ok=False, msg="Please wait 30 seconds before asking for a new code."), 429
-        if now - win > 3600: sends, win = 0, now
-        if sends >= 5: return jsonify(ok=False, msg="Too many codes requested. Please try again in an hour."), 429
-        code = "%06d" % secrets.randbelow(1000000)
-        db().execute("INSERT INTO email_otps(email,code_hash,expires,attempts,verified,sent_at,sends,window_start) VALUES(?,?,?,?,?,?,?,?) "
-                     "ON CONFLICT(email) DO UPDATE SET code_hash=excluded.code_hash,expires=excluded.expires,attempts=0,verified=0,sent_at=excluded.sent_at,sends=excluded.sends,window_start=excluded.window_start",
-                     (email, otp_hash(email, code), now + 600, 0, 0, now, sends + 1, win))
-        db().commit()
-        sent = mailer.send(email, "Your Tuneflix verification code",
-            mailer.wrap("Verify your email", "Your verification code is <b style='font-size:26px;letter-spacing:6px'>%s</b><br>It is valid for 10 minutes." % code))
-        if not sent: print("[EMAIL OTP - mail not configured] %s -> %s" % (email, code), flush=True)
-        return jsonify(ok=True, msg="We have sent a 6-digit verification code to %s. Please check your inbox and spam folder." % email)
-
-    @app.route("/request-access/verify", methods=["POST"])
-    def otp_verify():
-        email = request.form.get("email", "").strip().lower(); code = re.sub(r"\D", "", request.form.get("code", ""))
-        r = db().execute("SELECT * FROM email_otps WHERE email=?", (email,)).fetchone()
-        if not r or r["expires"] < time.time(): return jsonify(ok=False, msg="This code has expired. Please click Regenerate Code."), 400
-        if (r["attempts"] or 0) >= 5: return jsonify(ok=False, msg="Too many wrong attempts. Please click Regenerate Code."), 429
-        if not hmac.compare_digest(r["code_hash"] or "", otp_hash(email, code)):
-            db().execute("UPDATE email_otps SET attempts=attempts+1 WHERE email=?", (email,)); db().commit()
-            return jsonify(ok=False, msg="That code is not correct. Please try again."), 400
-        db().execute("UPDATE email_otps SET verified=1, expires=? WHERE email=?", (time.time() + 1800, email)); db().commit()
-        return jsonify(ok=True, msg="Your email verification is successful. Please click Submit to complete your registration.")
 
     @app.route("/forgot", methods=["GET", "POST"])
     def forgot():

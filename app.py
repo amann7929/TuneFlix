@@ -63,7 +63,7 @@ def init():
             + ["ALTER TABLE users ADD COLUMN %s TEXT" % k for k in USER_COLS] + ["ALTER TABLE releases ADD COLUMN %s TEXT" % k for k in REL_COLS]:
         try: c.execute(s)
         except sqlite3.OperationalError: pass
-    c.executescript("CREATE TABLE IF NOT EXISTS email_otps(email TEXT PRIMARY KEY, code_hash TEXT, expires REAL, attempts INTEGER DEFAULT 0, verified INTEGER DEFAULT 0, sent_at REAL DEFAULT 0, sends INTEGER DEFAULT 0, window_start REAL DEFAULT 0);")
+    c.executescript("CREATE TABLE IF NOT EXISTS captcha_challenges(token_hash TEXT PRIMARY KEY, session_hash TEXT, question TEXT, answer_hash TEXT, expires REAL, attempts INTEGER DEFAULT 0, verified INTEGER DEFAULT 0);")
     c.executescript("CREATE TABLE IF NOT EXISTS resets(id INTEGER PRIMARY KEY, user_id INTEGER, token_hash TEXT, expires REAL, used INTEGER DEFAULT 0);")
     try: c.execute("PRAGMA journal_mode=WAL")
     except sqlite3.Error: pass
@@ -118,15 +118,76 @@ def _v(): return {"asset_v": int(os.path.getmtime(os.path.join(BASE, "static", "
 def index(): return render_template("index.html")
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
-def otp_required():
-    """Email OTP is enforced when a mail provider is set up (REQUIRE_EMAIL_OTP=auto), or always (1) / never (0)."""
-    v = os.environ.get("REQUIRE_EMAIL_OTP", "auto").strip().lower()
-    return mailer.configured() if v == "auto" else v in ("1", "true", "yes")
-app.jinja_env.globals["otp_required"] = otp_required
 
-def otp_ok(email):
-    r = db().execute("SELECT verified,expires FROM email_otps WHERE email=?", (email,)).fetchone()
-    return bool(r and r["verified"] and r["expires"] > time.time())
+def captcha_digest(value):
+    return hmac.new(str(app.secret_key).encode(), value.encode(), hashlib.sha256).hexdigest()
+
+def captcha_session_hash():
+    if "captcha_session" not in session:
+        session["captcha_session"] = secrets.token_urlsafe(24)
+    return captcha_digest(session["captcha_session"])
+
+def new_captcha():
+    session_hash = captcha_session_hash()
+    now = time.time()
+    db().execute("DELETE FROM captcha_challenges WHERE expires<=?", (now,))
+    old_token = session.pop("captcha_token", None)
+    if old_token:
+        db().execute("DELETE FROM captcha_challenges WHERE token_hash=?", (captcha_digest(old_token),))
+    left, right = secrets.randbelow(40) + 10, secrets.randbelow(40) + 10
+    token = secrets.token_urlsafe(32)
+    question = "What is %d + %d?" % (left, right)
+    db().execute(
+        "INSERT INTO captcha_challenges(token_hash,session_hash,question,answer_hash,expires) VALUES(?,?,?,?,?)",
+        (captcha_digest(token), session_hash, question, captcha_digest(str(left + right)), now + 300))
+    db().commit()
+    session["captcha_token"] = token
+    return {"token": token, "question": question}
+
+def current_captcha():
+    token = session.get("captcha_token")
+    if token:
+        row = db().execute(
+            "SELECT question FROM captcha_challenges WHERE token_hash=? AND session_hash=? AND expires>?",
+            (captcha_digest(token), captcha_session_hash(), time.time())).fetchone()
+        if row:
+            return {"token": token, "question": row["question"]}
+    return new_captcha()
+
+def captcha_is_verified(token):
+    if not token or not hmac.compare_digest(token, session.get("captcha_token", "")):
+        return False
+    row = db().execute(
+        "SELECT verified FROM captcha_challenges WHERE token_hash=? AND session_hash=? AND expires>?",
+        (captcha_digest(token), captcha_session_hash(), time.time())).fetchone()
+    return bool(row and row["verified"])
+
+@app.route("/request-access/captcha/verify", methods=["POST"])
+def captcha_verify():
+    token = request.form.get("captcha_token", "")
+    if not token or not hmac.compare_digest(token, session.get("captcha_token", "")):
+        return jsonify(ok=False, msg="This CAPTCHA has expired. Please refresh it."), 400
+    row = db().execute(
+        "SELECT answer_hash,attempts,verified FROM captcha_challenges WHERE token_hash=? AND session_hash=? AND expires>?",
+        (captcha_digest(token), captcha_session_hash(), time.time())).fetchone()
+    if not row:
+        return jsonify(ok=False, msg="This CAPTCHA has expired. Please refresh it."), 400
+    if row["verified"]:
+        return jsonify(ok=True, msg="CAPTCHA verified. You can submit your registration.")
+    if row["attempts"] >= 5:
+        return jsonify(ok=False, msg="Too many attempts. Please refresh the CAPTCHA."), 429
+    answer_hash = captcha_digest(request.form.get("answer", "").strip())
+    if not hmac.compare_digest(row["answer_hash"], answer_hash):
+        db().execute("UPDATE captcha_challenges SET attempts=attempts+1 WHERE token_hash=?", (captcha_digest(token),))
+        db().commit()
+        return jsonify(ok=False, msg="That answer is not correct. Please try again."), 400
+    db().execute("UPDATE captcha_challenges SET verified=1 WHERE token_hash=?", (captcha_digest(token),))
+    db().commit()
+    return jsonify(ok=True, msg="CAPTCHA verified. You can submit your registration.")
+
+@app.route("/request-access/captcha/new", methods=["POST"])
+def captcha_new():
+    return jsonify(ok=True, captcha=new_captcha())
 
 @app.route("/register")
 def register_alias(): return redirect("/request-access")
@@ -138,7 +199,7 @@ def request_access():
         f = request.form; v = {k: (f.get(k) or "").strip() for k in f.keys()}
         email = v.get("email", "").lower(); v["email"] = email
         def back(msg):
-            flash(msg, "err"); return render_template("register.html", v=v, step=1)
+            flash(msg, "err"); return render_template("register.html", v=v, step=1, captcha=current_captcha())
         acct = v.get("acct_type", "")
         if acct not in ("Individual", "Company"): return back("Please choose Individual or Company.")
         if not v.get("name"): return back("Please enter your full name.")
@@ -168,9 +229,9 @@ def request_access():
             except ValueError: return back("Revenue must be a number.")
         if db().execute("SELECT 1 FROM users WHERE email=?", (email,)).fetchone():
             flash("This email is already registered. Try signing in.", "err"); return redirect("/login")
+        if not captcha_is_verified(f.get("captcha_token", "")):
+            return back("Please complete the CAPTCHA before submitting.")
         admin = int(bool(ADMIN_EMAIL) and email == ADMIN_EMAIL)
-        need_otp = otp_required() and not admin
-        if need_otp and not otp_ok(email): return back("Please verify your email with the code we send you before submitting.")
         ok = bool(admin) or not REQUIRE_APPROVAL
         aad_file = save(request.files.get("aadhaar_file"), DOC); pan_file = save(request.files.get("pan_file"), DOC)
         display = v.get("company") if acct == "Company" and v.get("company") else v["name"]
@@ -178,8 +239,8 @@ def request_access():
               has_agreement,old_distributor,change_reason,revenue_6m,revenue_cur,email_verified,aadhaar,aadhaar_file,pan_file) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (display, email, acct, generate_password_hash(f["password"]), "approved" if ok else "pending", admin, "tf_" + secrets.token_urlsafe(24),
              acct, phone, v.get("company"), v.get("signatory") or v["name"], v.get("country"), v.get("state"), v.get("city"), v.get("address"), v.get("website"), v.get("pan"),
-             has, v.get("old_distributor"), v.get("change_reason"), rev, v.get("revenue_cur") or "INR", "1" if need_otp else "0", aad, aad_file, pan_file))
-        db().execute("DELETE FROM email_otps WHERE email=?", (email,)); db().commit()
+             has, v.get("old_distributor"), v.get("change_reason"), rev, v.get("revenue_cur") or "INR", "0", aad, aad_file, pan_file))
+        db().execute("DELETE FROM captcha_challenges WHERE token_hash=?", (captcha_digest(f.get("captcha_token", "")),)); db().commit()
         if ok:
             session.clear(); session["uid"] = cur.lastrowid; session["welcome"] = 1
             flash("Welcome to Tuneflix! Your account is ready.", "ok")
@@ -187,7 +248,7 @@ def request_access():
         if ADMIN_EMAIL: mailer.send(ADMIN_EMAIL, "New Tuneflix registration", mailer.wrap("New registration", "%s (%s, %s) has registered and is waiting for approval." % (display, email, acct), "Open admin panel", request.host_url + "admin"))
         session.clear(); session["reg_type"] = acct
         return redirect("/thanks")
-    return render_template("register.html", v={}, step=1)
+    return render_template("register.html", v={}, step=1, captcha=new_captcha())
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

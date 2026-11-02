@@ -49,8 +49,10 @@
 .authlogo{display:flex!important;margin:0 auto 22px;justify-content:center;width:max-content;max-width:100%}
 .authlogo img{height:46px!important;max-width:100%}
 .ostep{margin-top:16px;display:grid;gap:10px}
-.otp-row{display:flex;gap:10px}.otp-row input{letter-spacing:8px;text-align:center;font-weight:800;font-size:20px}
-.otp-row .btn{width:auto!important;margin:0!important;flex:none;padding:12px 20px}
+.captcha-question{width:max-content;max-width:100%;padding:13px 18px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:20px;font-weight:800;letter-spacing:.04em}
+.captcha-row{display:flex;gap:10px;align-items:center}
+.captcha-row input{max-width:130px;text-align:center;font-weight:800;font-size:20px}
+.captcha-row .btn{width:auto!important;margin:0!important;flex:none;padding:12px 20px}
 .linkb{background:none;border:0;color:var(--w-ac2);font:inherit;font-weight:700;cursor:pointer;padding:0;margin-top:8px;width:auto!important}
 .linkb[disabled]{opacity:.5;cursor:default}
 .hide{display:none!important}
@@ -108,3 +110,10 @@ button.btn{font-family:inherit}
 .secure svg{width:18px;height:18px;flex:none;color:#2ddc6f;margin-top:1px}
 .wz-nav .btn.o{display:inline-flex;align-items:center;gap:8px}
 .wz-nav .btn.o:hover{border-color:var(--ac,#e30e0e)}
+.form.wide .captcha-row .captcha-refresh{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 18px;border:1px solid rgba(255,104,91,.42);border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025)),#17171b;color:#fff;font-size:14px;font-weight:700;letter-spacing:.01em;box-shadow:0 8px 22px rgba(0,0,0,.28),0 0 20px rgba(227,14,14,.12),inset 0 1px 0 rgba(255,255,255,.1);transition:transform .2s,border-color .2s,box-shadow .2s,background .2s}
+.form.wide .captcha-refresh svg{width:18px;height:18px;flex:none;color:#ff766b;transition:transform .45s}
+.form.wide .captcha-refresh:hover{transform:translateY(-2px);border-color:#ff766b;background:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.035)),#1c1719;box-shadow:0 12px 28px rgba(0,0,0,.35),0 0 24px rgba(227,14,14,.22),inset 0 1px 0 rgba(255,255,255,.14)}
+.form.wide .captcha-refresh:hover svg{transform:rotate(180deg)}
+.form.wide .captcha-refresh:focus-visible{outline:2px solid #ff766b;outline-offset:3px}
+.form.wide .captcha-refresh:disabled{opacity:.55;cursor:wait;transform:none;box-shadow:none}
+@media(prefers-reduced-motion:reduce){.form.wide .captcha-refresh,.form.wide .captcha-refresh svg{transition:none}}
