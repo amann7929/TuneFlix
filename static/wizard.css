@@ -102,6 +102,59 @@ button.btn{font-family:inherit}
 .kcard{padding:20px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.01))}
 .kcard h4{display:flex;align-items:center;gap:10px;font-size:16px;margin-bottom:2px}
 .kcard h4 svg{width:22px;height:22px;color:#ff6a5e}
+.auth-body{background:#f4f4f5!important;color:#171719!important}
+.auth-body header{display:none}
+.auth-body .flash{position:fixed;z-index:20;top:16px;left:50%;transform:translateX(-50%);width:min(520px,calc(100% - 28px));box-shadow:0 12px 36px rgba(0,0,0,.12)}
+.auth-screen{--tx:#171719;--mu:#73737b;--bg:#fff;--bg2:#f7f7f8;--card:#fff;--line:#e4e4e7;--red:#111;--red2:#111;min-height:100svh;width:100%;padding:48px 20px;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 0%,#fff 0%,#f5f5f6 72%)}
+.auth-card,.auth-screen .form.wide{width:100%;max-width:530px;margin:0 auto;padding:48px;border:1px solid #e6e6e8;border-radius:30px;background:rgba(255,255,255,.96);box-shadow:0 26px 80px rgba(18,18,22,.09),0 2px 6px rgba(18,18,22,.025);color:#171719}
+.auth-card:before{display:none}
+.auth-card .authlogo{margin:0 0 4px;justify-content:flex-start;box-shadow:none!important;width:max-content}
+.auth-card .authlogo img{height:42px!important;width:auto;max-width:220px}
+.auth-kicker{margin:0 0 27px;color:#77777e;font-size:12px;font-weight:700;letter-spacing:.15em}
+.auth-switch{display:flex;gap:5px;margin:0 0 27px;padding:4px;border-radius:12px;background:#f1f1f3}
+.auth-switch a{flex:1;padding:10px;text-align:center;border-radius:9px;color:#696970;font-size:14px;font-weight:700;transition:.18s}
+.auth-switch a.active{background:#fff;color:#171719;box-shadow:0 2px 7px #15151a16}
+.auth-card h1,.auth-screen .form.wide h1{margin:0;color:#171719;font-size:clamp(28px,4vw,36px);font-weight:750;letter-spacing:-.035em;line-height:1.15;background:none;-webkit-text-fill-color:currentColor}
+.auth-sub,.register-intro{margin:13px 0 25px;color:#73737b;font-size:16px;line-height:1.55}
+.auth-card form>label,.auth-card .g2c label{display:block;margin:17px 0 7px;color:#45454c;font-size:14px;font-weight:650}
+.auth-card input:not([type=radio]):not([type=checkbox]):not([type=file]),.auth-card select,.auth-card textarea,.auth-screen .form.wide input:not([type=radio]):not([type=checkbox]):not([type=file]),.auth-screen .form.wide select,.auth-screen .form.wide textarea{width:100%;min-height:54px;padding:14px 16px;border:1px solid #dedee2;border-radius:14px;background:#fff;color:#171719;font:inherit;font-size:16px;transition:border-color .18s,box-shadow .18s}
+.auth-card input:focus,.auth-card select:focus,.auth-card textarea:focus{outline:0;border-color:#96969d!important;box-shadow:0 0 0 4px rgba(25,25,30,.07)!important;background:#fff!important}
+.password-field{position:relative}
+.password-field input{padding-right:54px!important}
+.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:#77777e;cursor:pointer}
+.password-toggle:hover{background:#f1f1f3;color:#171719}
+.password-toggle:focus-visible{outline:2px solid #555;outline-offset:1px}
+.password-toggle svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.password-toggle .eye-slash{display:none}
+.password-toggle.is-visible .eye-slash{display:block}
+.auth-forgot{display:block;margin:10px 0 20px;text-align:right;color:#57575e;font-size:13px;font-weight:600}
+.auth-submit{width:100%;min-height:56px;margin-top:24px;border:0;border-radius:14px;background:#080809;color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
+.auth-submit:hover{transform:translateY(-1px);background:#252529;box-shadow:0 10px 24px #1112}
+.auth-bottom{margin:22px 0 0;color:#73737b;text-align:center;font-size:14px}
+.auth-bottom a{color:#171719;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.register-card.auth-card{max-width:790px;padding:38px 42px}
+.register-card .authlogo{margin-bottom:4px}
+.register-card .auth-kicker{margin-bottom:20px}
+.register-card h1{font-size:32px!important}
+.register-card .register-intro{margin:9px 0 18px}
+.register-card .wz-tabs{gap:7px;margin:0 0 9px;padding:7px 0 14px;border-bottom:1px solid #ededf0}
+.register-card .wz-tab{gap:7px;padding:8px 12px;border:1px solid #e5e5e8;background:#f8f8f9;color:#686870;font-size:13px}
+.register-card .wz-tab i{width:22px;height:22px;background:#e9e9ec;color:#56565d}
+.register-card .wz-tab.on{border-color:#171719;background:#171719;color:#fff;box-shadow:0 5px 14px #1112}
+.register-card .wz-tab.on i,.register-card .wz-tab.done i{background:#fff;color:#171719}
+.register-card .wz-pane h3{color:#202024}
+.register-card .wz-pane .hint,.register-card .m{color:#73737b}
+.register-card .choice span,.register-card .kcard,.register-card .sall,.register-card .st{background:#fafafb;border-color:#e6e6e9;color:#29292e}
+.register-card .choice span small{color:#73737b}
+.register-card .choice input:checked+span,.register-card .st:has(input:checked){border-color:#29292e;background:#f3f3f5;box-shadow:0 0 0 2px #17171912}
+.register-card .choice span svg,.register-card .kcard h4 svg{color:#34343a}
+.register-card .secure{color:#53535b}
+.register-card .wz-nav .btn.p,.register-card .wz-sub .btn.p,.register-card .auth-card button.btn{border:0;background:#09090a;color:#fff;box-shadow:0 8px 20px #1112}
+.register-card .wz-nav .btn.g{border:1px solid #dedee2;background:#fff;color:#303036}
+.register-card .upl-btn{background:#18181a;color:#fff!important;box-shadow:none}
+.register-card .auth-bottom{margin-top:22px}
+@media(max-width:700px){.auth-screen{padding:24px 16px;place-items:start center}.auth-card,.auth-screen .form.wide,.register-card.auth-card{max-width:530px;padding:30px 23px;border-radius:23px}.register-card.auth-card{padding:28px 19px}.register-card h1{font-size:28px!important}.register-card .wz-tabs{gap:6px}.register-card .wz-tab{padding:8px 10px;font-size:12px}.register-card .wz-tab i{width:20px;height:20px}}
+@media(max-width:380px){.auth-card,.auth-screen .form.wide{padding:26px 18px}.register-card .wz-tab{gap:5px;padding:7px 8px;font-size:11px}}
 .upl{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px}
 .upl input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .upl-btn{display:inline-flex!important;align-items:center;gap:10px;margin:0!important;padding:12px 20px;border-radius:12px;cursor:pointer;color:#fff!important;font-weight:700!important;font-size:14.5px!important;

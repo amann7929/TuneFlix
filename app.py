@@ -12,10 +12,17 @@ def _writable(d):
         os.makedirs(os.path.join(d, "uploads"), exist_ok=True)
         t = os.path.join(d, ".w"); open(t, "w").close(); os.remove(t); return True
     except OSError: return False
-DATA = os.environ.get("DATA_DIR") or os.path.join(BASE, "data")
+# Render's writable app filesystem is ephemeral. Keep the database and uploaded
+# files on the persistent disk, and fail at startup if it is missing instead of
+# silently starting with an empty database in /tmp.
+DATA = os.environ.get("DATA_DIR") or (
+    "/var/data" if os.environ.get("RENDER") else os.path.join(BASE, "data")
+)
 if not _writable(DATA):
-    print("WARNING: %s is not writable, using /tmp/tuneflix (data will NOT persist)" % DATA, flush=True)
-    DATA = "/tmp/tuneflix"; os.makedirs(os.path.join(DATA, "uploads"), exist_ok=True)
+    raise RuntimeError(
+        "DATA_DIR %r is not writable. On Render, attach a persistent disk and "
+        "set DATA_DIR to its mount path (for example /var/data)." % DATA
+    )
 UPLOADS = os.path.join(DATA, "uploads")
 DB = os.path.join(DATA, "tuneflix.db")
 REQUIRE_APPROVAL = os.environ.get("REQUIRE_APPROVAL", "1") == "1"   # 1 = new users wait for admin approval, 0 = open signup
@@ -112,7 +119,9 @@ def need(admin=False):
     return deco
 
 @app.context_processor
-def _v(): return {"asset_v": int(os.path.getmtime(os.path.join(BASE, "static", "style.css")))}
+def _v():
+    assets = [os.path.join(BASE, "static", name) for name in ("style.css", "wizard.css")]
+    return {"asset_v": "-".join(str(int(os.path.getmtime(path))) for path in assets)}
 
 @app.route("/")
 def index(): return render_template("index.html")

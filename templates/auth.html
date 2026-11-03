@@ -1,11 +1,19 @@
-{% extends "base.html" %}{% block title %}{{ 'Register' if signup else 'Sign in' }} — Tuneflix{% endblock %}
+{% extends "base.html" %}{% block title %}{{ 'Register' if signup else 'Sign in' }} · Tuneflix{% endblock %}
 {% block footer %}{% endblock %}
-{% block body %}<link rel="stylesheet" href="{{ url_for('static',filename='wizard.css') }}?v={{ asset_v }}"><div class="authwrap"><div class="form"><a href="/" class="logo authlogo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a><div style="display:flex;gap:8px;margin-bottom:22px"><a href="/login" class="btn {{ 'g' if signup else 'p' }}" style="flex:1;text-align:center;padding:10px">Sign in</a><a href="/request-access" class="btn {{ 'p' if signup else 'g' }}" style="flex:1;text-align:center;padding:10px">Register</a></div><form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">
-{% if signup %}<h1>Create your account</h1><p class="m">Free for everyone. Register and start releasing.</p>
-<label>Full name / label name</label><input name="name" required>
-<label>I am a</label><select name="kind"><option>Independent artist</option><option>Label / catalogue owner</option><option>Business (API)</option></select>
-{% else %}<h1>Sign in</h1><p class="m">Welcome back to Tuneflix Studio.</p>{% endif %}
-<label>Email</label><input type="email" name="email" required>
-<label>Password</label><input type="password" name="password" minlength="6" required>
-{% if not signup %}<a href="/forgot" style="display:block;text-align:right;margin-top:10px;font-size:13.5px;color:var(--red2)">Forgot password?</a>{% endif %}<button class="btn p">{{ 'Register now' if signup else 'Sign in' }}</button></form>
-<p class="m" style="margin-top:18px">{% if signup %}Already have an account? <a href="/login" style="color:var(--red2)">Sign in</a>{% else %}New here? <a href="/request-access" style="color:var(--red2)">Register now</a>{% endif %}</p></div></div>{% endblock %}
+{% block body %}<link rel="stylesheet" href="{{ url_for('static',filename='wizard.css') }}?v={{ asset_v }}">
+<main class="authwrap auth-screen"><section class="form auth-card">
+ <a href="/" class="logo authlogo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a>
+ <div class="auth-kicker">MUSIC DISTRIBUTION STUDIO</div>
+ <nav class="auth-switch" aria-label="Account"><a href="/login" class="{{ 'active' if not signup }}">Sign in</a><a href="/request-access" class="{{ 'active' if signup }}">Register</a></nav>
+ <form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">
+ {% if signup %}<h1>Create your account</h1><p class="auth-sub">Start building your music career with Tuneflix.</p>
+ <label>Full name / label name</label><input name="name" autocomplete="name" required>
+ <label>I am a</label><select name="kind"><option>Independent artist</option><option>Label / catalogue owner</option><option>Business (API)</option></select>
+ {% else %}<h1>Welcome back</h1><p class="auth-sub">Sign in to manage your distribution platform.</p>{% endif %}
+ <label>Email</label><input type="email" name="email" autocomplete="email" required autofocus>
+ <label>Password</label><div class="password-field"><input id="auth-password" type="password" name="password" minlength="6" autocomplete="{{ 'new-password' if signup else 'current-password' }}" required><button class="password-toggle" type="button" data-password-toggle="auth-password" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m4 4 16 16"/></svg></button></div>
+ {% if not signup %}<a href="/forgot" class="auth-forgot">Forgot password?</a>{% endif %}<button class="auth-submit">{{ 'Create account' if signup else 'Sign in' }}</button></form>
+ <p class="auth-bottom">{% if signup %}Already have an account? <a href="/login">Sign in</a>{% else %}New to Tuneflix? <a href="/request-access">Create an account</a>{% endif %}</p>
+</section></main>
+<script>(function(){document.querySelectorAll('[data-password-toggle]').forEach(function(b){b.addEventListener('click',function(){var i=document.getElementById(b.dataset.passwordToggle),show=i.type==='password';i.type=show?'text':'password';b.classList.toggle('is-visible',show);b.setAttribute('aria-label',show?'Hide password':'Show password');b.setAttribute('aria-pressed',String(show));});});})();</script>
+{% endblock %}

@@ -11,7 +11,7 @@
 <meta property="og:image" content="{{ url_for('static',filename='logo-square.png',_external=True) }}">
 <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}?v={{ asset_v }}">
 </head>
-<body>
+<body class="{{ 'auth-body' if request.path in ['/login','/register','/request-access'] else '' }}">
 <header><div class="wrap"><nav>
  <a href="/" class="logo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a>
  <div class="links" id="links">{% for t,h in [('Artists','/for-artists'),('Labels','/for-labels'),('Services','/services'),('API','/developers'),('Guides','/guides')] %}<a href="{{ h }}" class="{{ 'on' if request.path==h }}">{{ t }}</a>{% endfor %}{% if session.uid %}<a class="mob" href="/studio">Studio</a><a class="mob" href="/logout">Logout</a>{% else %}<a class="mob" href="/login">Sign in</a>{% endif %}</div>

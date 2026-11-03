@@ -4,10 +4,11 @@
 {% set ARL %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>{% endset %}
 {% set ARR %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>{% endset %}
 {% set UP %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>{% endset %}
-<div class="authwrap"><div class="form wide wz">
+<main class="authwrap auth-screen"><div class="form wide wz auth-card register-card">
 <a href="/" class="logo authlogo"><img src="{{ url_for('static',filename='logo.png') }}" alt="Tuneflix"></a>
-<div style="display:flex;gap:8px;margin-bottom:24px"><a href="/login" class="btn g" style="flex:1;text-align:center;padding:11px">Sign in</a><a href="/request-access" class="btn p" style="flex:1;text-align:center;padding:11px">Register</a></div>
-<h1>New here?</h1><p class="m" style="margin-bottom:6px">Signing up is easy. It only takes a few steps.</p>
+<div class="auth-kicker">YOUR MUSIC. YOUR NEXT CHAPTER.</div>
+<nav class="auth-switch" aria-label="Account"><a href="/login">Sign in</a><a href="/request-access" class="active">Register</a></nav>
+<h1>Let’s get you started</h1><p class="m register-intro">Create your Tuneflix account and bring your music to the world.</p>
 
 <form method="post" id="rf" novalidate autocomplete="on" enctype="multipart/form-data">{{ tk() }}
 <div data-wiz data-start="{{ step - 1 }}">
@@ -43,8 +44,8 @@
    <div><label>State</label><input name="state" value="{{ v.get('state','') }}" maxlength="60" autocomplete="address-level1"></div>
    <div><label>City <b class="req">*</b></label><input name="city" value="{{ v.get('city','') }}" required maxlength="60" autocomplete="address-level2"></div>
    <div><label>Address</label><input name="address" value="{{ v.get('address','') }}" maxlength="250" autocomplete="street-address"></div>
-   <div><label>Password <b class="req">*</b></label><input type="password" name="password" id="pw" minlength="8" required autocomplete="new-password" placeholder="At least 8 characters"></div>
-   <div><label>Confirm password <b class="req">*</b></label><input type="password" name="confirm" id="pw2" minlength="8" required autocomplete="new-password"></div>
+   <div><label>Password <b class="req">*</b></label><div class="password-field"><input type="password" name="password" id="pw" minlength="8" required autocomplete="new-password" placeholder="At least 8 characters"><button class="password-toggle" type="button" data-password-toggle="pw" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m4 4 16 16"/></svg></button></div></div>
+   <div><label>Confirm password <b class="req">*</b></label><div class="password-field"><input type="password" name="confirm" id="pw2" minlength="8" required autocomplete="new-password"><button class="password-toggle" type="button" data-password-toggle="pw2" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m4 4 16 16"/></svg></button></div></div>
   </div>
  </div>
 
@@ -102,8 +103,8 @@
   <button type="button" class="btn p wz-next">Next{{ ARR }}</button>
   <span class="wz-sub" hidden><button class="btn p" id="subBtn" disabled>Submit{{ ARR }}</button></span></div>
 </div></form>
-<p class="m" style="margin-top:20px;text-align:center">Already have an account? <a href="/login" style="color:var(--red2)">Sign in</a></p>
-</div></div>
+<p class="m auth-bottom" style="margin-top:20px;text-align:center">Already have an account? <a href="/login">Sign in</a></p>
+</div></main>
 <script>
 (function(){
   var f=document.getElementById('rf'), verified=false, LAST=4, captchaRequest=0;
@@ -184,5 +185,6 @@
   };
 })();
 </script>
+<script>(function(){document.querySelectorAll('[data-password-toggle]').forEach(function(b){b.addEventListener('click',function(){var i=document.getElementById(b.dataset.passwordToggle),show=i.type==='password';i.type=show?'text':'password';b.classList.toggle('is-visible',show);b.setAttribute('aria-label',show?'Hide password':'Show password');b.setAttribute('aria-pressed',String(show));});});})();</script>
 <script src="{{ url_for('static',filename='wizard.js') }}?v={{ asset_v }}"></script>
 {% endblock %}
