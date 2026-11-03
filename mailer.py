@@ -13,6 +13,9 @@ def _post(url, body, headers):
 def _send(to, subject, html):
     frm = os.environ.get("MAIL_FROM") or os.environ.get("SMTP_USER") or ""
     name = os.environ.get("MAIL_NAME", "Tuneflix")
+    if not frm:
+        print("MAIL ERROR: MAIL_FROM (or SMTP_USER) is not configured", flush=True)
+        return False
     try:
         if os.environ.get("BREVO_API_KEY"):
             _post("https://api.brevo.com/v3/smtp/email", {"sender": {"name": name, "email": frm}, "to": [{"email": to}],
@@ -28,8 +31,19 @@ def _send(to, subject, html):
             if port != 465: s.starttls()
             if os.environ.get("SMTP_USER"): s.login(os.environ["SMTP_USER"], os.environ.get("SMTP_PASSWORD", ""))
             s.send_message(m); s.quit()
+        else:
+            return False
+        return True
     except Exception as e:
-        print("MAIL ERROR to %s: %s" % (to, e), flush=True)
+        print("MAIL ERROR: provider rejected or could not deliver message to %s: %s" % (to, e), flush=True)
+        return False
+
+def send_now(to, subject, html):
+    """Send before returning so callers can report actual provider acceptance."""
+    if not configured():
+        print("MAIL ERROR: no mail provider is configured", flush=True)
+        return False
+    return _send(to, subject, html)
 
 def send(to, subject, html):
     """Send in background. Returns True if a mail provider is configured."""

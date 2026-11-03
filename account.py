@@ -5,7 +5,8 @@ import mailer
 
 def setup(app, db, need):
     sha = lambda t: hashlib.sha256(t.encode()).hexdigest()
-    def base_url(): return os.environ.get("BASE_URL", "").rstrip("/") or request.host_url.rstrip("/")
+    def base_url():
+        return (os.environ.get("BASE_URL") or os.environ.get("RENDER_EXTERNAL_URL") or request.host_url).rstrip("/")
 
     def make_link(uid):
         t = secrets.token_urlsafe(32); d = db()
@@ -22,10 +23,16 @@ def setup(app, db, need):
             u = db().execute("SELECT * FROM users WHERE email=?", (request.form["email"].strip().lower(),)).fetchone()
             if u:
                 link = make_link(u["id"])
-                sent = mailer.send(u["email"], "Reset your Tuneflix password",
-                    mailer.wrap("Reset your password", "We received a request to reset your password. This link is valid for 1 hour.", "Reset password", link))
-                if not sent: print("[RESET LINK - mail not configured] %s -> %s" % (u["email"], link), flush=True)
-            flash("If this email is registered, a password reset link has been sent. Please check your inbox and spam folder.", "ok")
+                body = ("We received a request to reset your password. This link is valid for 1 hour. "
+                        "If the button does not work, open this link: <a href='%s'>%s</a>" % (link, link))
+                sent = mailer.send_now(u["email"], "Reset your Tuneflix password",
+                    mailer.wrap("Reset your password", body, "Reset password", link))
+                if sent:
+                    flash("Reset email sent. Check your inbox and spam folder; the link expires in 1 hour.", "ok")
+                else:
+                    flash("We could not send the reset email right now. Please try again shortly or contact support.", "err")
+            else:
+                flash("If this email is registered, a password reset link will be sent. Please check your inbox and spam folder.", "ok")
             return redirect("/login")
         return render_template("forgot.html")
 
